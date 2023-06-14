@@ -34,7 +34,7 @@ public abstract class MixinWorld
     @Inject(method = "tickEntity(Ljava/util/function/Consumer;Lnet/minecraft/entity/Entity;)V", at = @At("HEAD"), cancellable = true)
     private void preventEntityTicking(Consumer<Entity> consumer, Entity entityIn, CallbackInfo ci)
     {
-        if (Configs.Disable.DISABLE_ENTITY_TICKING.getBooleanValue() && (entityIn instanceof PlayerEntity) == false)
+        if (Configs.Disable.DISABLE_ENTITY_TICKING.getBooleanValue() && !(entityIn instanceof PlayerEntity))
         {
             ci.cancel();
         }
@@ -58,7 +58,7 @@ public abstract class MixinWorld
     {
         if (Configs.Fixes.TILE_UNLOAD_OPTIMIZATION.getBooleanValue())
         {
-            if (this.unloadedBlockEntities.isEmpty() == false)
+            if (!this.unloadedBlockEntities.isEmpty())
             {
                 HashSet<BlockEntity> remove = new HashSet<>();
                 remove.addAll(this.unloadedBlockEntities);
