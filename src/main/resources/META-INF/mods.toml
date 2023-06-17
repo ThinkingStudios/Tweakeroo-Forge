@@ -26,7 +26,7 @@ side = "CLIENT"
 [[dependencies.tweakeroo]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.19,)"
+versionRange = "[1.19.3,)"
 ordering = "NONE"
 side = "CLIENT"
 
