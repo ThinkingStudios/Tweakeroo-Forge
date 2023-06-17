@@ -11,10 +11,11 @@ logoFile="icon.png" #optional
 credits="masa" #optional
 authors="TexTrue, ThinkingStudio" #optional
 description = '''
-This mod is a unofficial Tweakeroo forge port.
+Tweakeroo unofficial forge port.
 
 Adds a bunch of configurable client-side tweaks.
 '''
+
 [[dependencies.tweakeroo]]
 modId = "forge"
 mandatory = true
