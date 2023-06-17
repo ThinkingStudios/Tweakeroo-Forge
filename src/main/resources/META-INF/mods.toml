@@ -5,13 +5,15 @@ license = "LGPLv3"
 [[mods]]
 modId = "tweakeroo"
 version = "${version}"
-displayName = "Tweakeree"
-displayURL="https://changeme.dev/" #optional
+displayName = "Tweakerge"
+displayURL="https://github.com/ThinkingStudios/Tweakeroo-Forge" #optional
 logoFile="icon.png" #optional
 credits="masa" #optional
 authors="TexTrue, ThinkingStudio" #optional
 description = '''
-Adds a bunch of configurable client-side tweaks
+This mod is a unofficial Tweakeroo forge port.
+
+Adds a bunch of configurable client-side tweaks.
 '''
 
 [[dependencies.tweakeroo]]
@@ -19,11 +21,18 @@ modId = "forge"
 mandatory = true
 versionRange = "[37,)"
 ordering = "NONE"
-side = "BOTH"
+side = "CLIENT"
 
 [[dependencies.tweakeroo]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[1.17,)"
 ordering = "NONE"
-side = "BOTH"
+side = "CLIENT"
+
+[[dependencies.tweakeroo]]
+modId = "malilib"
+mandatory = true
+versionRange = "[0.1.5,)"
+ordering = "NONE"
+side = "CLIENT"
