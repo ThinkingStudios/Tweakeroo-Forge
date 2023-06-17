@@ -1,6 +1,13 @@
+<center><div align="center">
+
+<img height="100" src="icon/400x400.png" width="100"/>
+
 # Tweakerge
 
-This mod is a unofficial Tweakeroo forge port.
+Tweakeroo unofficial forge port.
+
+</div></center>
+
 Tweakerge is a client-side-only Minecraft mod.
 It adds a selection of miscellaneous, configurable, client-side tweaks to the game.
 Some examples of these are the "flexible block placement" tweak and the "fast block placement" tweak.
