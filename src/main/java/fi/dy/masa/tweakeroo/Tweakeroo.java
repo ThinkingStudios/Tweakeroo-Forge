@@ -26,7 +26,6 @@ public class Tweakeroo {
     public void onInitializeClient(FMLClientSetupEvent event) {
         ForgePlatformCompat.getInstance().getModClientExtensionPoint();
         InitializationHandler.getInstance().registerInitializationHandler(new InitHandler());
-
         ForgePlatformCompat.getInstance().getMod(Reference.MOD_ID).registerModConfigScreen((screen) -> {
             GuiConfigs gui = new GuiConfigs();
             gui.setParent(screen);

@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[40,)"
+loaderVersion = "[46,)"
 license = "LGPLv3"
 
 [[mods]]
@@ -19,20 +19,20 @@ Adds a bunch of configurable client-side tweaks.
 [[dependencies.tweakeroo]]
 modId = "forge"
 mandatory = true
-versionRange = "[40,)"
+versionRange = "[46,)"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies.tweakeroo]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.19.3,)"
+versionRange = "[1.20,)"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies.tweakeroo]]
 modId = "malilib"
 mandatory = true
-versionRange = "[0.1.5,)"
+versionRange = "[0.1.0,)"
 ordering = "NONE"
 side = "CLIENT"
