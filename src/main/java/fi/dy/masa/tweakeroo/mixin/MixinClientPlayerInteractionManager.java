@@ -49,11 +49,7 @@ public abstract class MixinClientPlayerInteractionManager
 
     @Inject(method = "method_41929",
             slice = @Slice(from = @At(value = "INVOKE",
-                                      target = "Lnet/minecraft/item/ItemStack;use(" +
-                                               "Lnet/minecraft/world/World;" +
-                                               "Lnet/minecraft/entity/player/PlayerEntity;" +
-                                               "Lnet/minecraft/util/Hand;" +
-                                               ")Lnet/minecraft/util/TypedActionResult;")),
+                                      target = "Lnet/minecraft/item/ItemStack;use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;")),
             at = @At("RETURN"))
     private void onProcessRightClickPost(Hand hand, PlayerEntity playerEntity,
                                          MutableObject<?> mutableObject, int sequence,
@@ -103,7 +99,7 @@ public abstract class MixinClientPlayerInteractionManager
             ci.cancel();
         }
         else if (FeatureToggle.TWEAK_ENTITY_TYPE_ATTACK_RESTRICTION.getBooleanValue() &&
-                 MiscTweaks.isEntityAllowedByAttackingRestriction(target.getType()) == false)
+                !MiscTweaks.isEntityAllowedByAttackingRestriction(target.getType()))
         {
             ci.cancel();
         }
