@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 @Mixin(World.class)
@@ -30,7 +31,7 @@ public abstract class MixinWorld
 
     @Shadow
     @Final
-    protected List<BlockEntity> unloadedBlockEntities;
+    protected Set<BlockEntity> unloadedBlockEntities;
 
     @Inject(method = "tickEntity(Ljava/util/function/Consumer;Lnet/minecraft/entity/Entity;)V", at = @At("HEAD"), cancellable = true)
     private void preventEntityTicking(Consumer<Entity> consumer, Entity entityIn, CallbackInfo ci)
