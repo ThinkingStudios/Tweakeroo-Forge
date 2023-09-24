@@ -3,7 +3,7 @@ loaderVersion = "[40,)"
 license = "LGPLv3"
 
 [[mods]]
-modId = "tweakeroo"
+modId = "tweakerge"
 version = "${version}"
 displayName = "Tweakerge"
 displayURL="https://github.com/ThinkingStudios/Tweakeroo-Forge" #optional
@@ -16,23 +16,23 @@ Tweakeroo unofficial forge port.
 Adds a bunch of configurable client-side tweaks.
 '''
 
-[[dependencies.tweakeroo]]
+[[dependencies.tweakerge]]
 modId = "forge"
 mandatory = true
 versionRange = "[40,)"
 ordering = "NONE"
 side = "CLIENT"
 
-[[dependencies.tweakeroo]]
+[[dependencies.tweakerge]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[1.19,)"
 ordering = "NONE"
 side = "CLIENT"
 
-[[dependencies.tweakeroo]]
-modId = "malilib"
+[[dependencies.tweakerge]]
+modId = "mafglib"
 mandatory = true
-versionRange = "[0.1.5,)"
+versionRange = "*"
 ordering = "NONE"
 side = "CLIENT"
