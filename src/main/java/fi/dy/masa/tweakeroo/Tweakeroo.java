@@ -1,7 +1,9 @@
 package fi.dy.masa.tweakeroo;
 
 import fi.dy.masa.malilib.compat.forge.ForgePlatformUtils;
+import fi.dy.masa.tweakeroo.compat.forge.ForgeEventHandler;
 import fi.dy.masa.tweakeroo.gui.GuiConfigs;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -26,10 +28,13 @@ public class Tweakeroo {
     public void onInitializeClient(FMLClientSetupEvent event) {
         ForgePlatformUtils.getInstance().getClientModIgnoredServerOnly();
         InitializationHandler.getInstance().registerInitializationHandler(new InitHandler());
+
         ForgePlatformUtils.getInstance().getMod(Reference.MOD_ID).registerModConfigScreen((screen) -> {
             GuiConfigs gui = new GuiConfigs();
             gui.setParent(screen);
             return gui;
         });
+
+        MinecraftForge.EVENT_BUS.register(new ForgeEventHandler());
     }
 }
