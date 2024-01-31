@@ -14,7 +14,7 @@ group = project.maven_group
 loom {
     forge {
         mixinConfigs = [
-                "tweakeroo.mixins.json"
+                "tweakerge.mixins.json"
         ]
     }
 }
