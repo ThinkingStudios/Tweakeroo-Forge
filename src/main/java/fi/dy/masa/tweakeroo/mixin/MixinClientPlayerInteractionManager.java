@@ -47,6 +47,7 @@ public abstract class MixinClientPlayerInteractionManager
         }
     }
 
+    /* Broken with Forge, use `PlayerDestroyItemEvent` to impl
     @Inject(method = "method_41929",
             slice = @Slice(from = @At(value = "INVOKE",
                                       target = "Lnet/minecraft/item/ItemStack;use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;")),
@@ -57,6 +58,7 @@ public abstract class MixinClientPlayerInteractionManager
     {
         PlacementTweaks.onProcessRightClickPost(playerEntity, hand);
     }
+     */
 
     @Inject(method = "interactEntity(" +
                      "Lnet/minecraft/entity/player/PlayerEntity;" +
