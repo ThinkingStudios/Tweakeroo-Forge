@@ -11,24 +11,19 @@ archivesBaseName = project.archives_base_name
 version = "${project.mod_version}-mc${project.minecraft_version}"
 group = project.maven_group
 
-loom {
-    forge {
-        mixinConfigs = [
-                "tweakerge.mixins.json"
-        ]
-    }
-}
-
 repositories {
+    maven { url "https://maven.neoforged.net/releases/" }
     maven { url 'https://api.modrinth.com/maven' }
+    maven { url "https://www.jitpack.io" }
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    forge "net.minecraftforge:forge:${project.forge_version}"
+    neoForge "net.neoforged:neoforge:${project.neoforge_version}"
 
     modImplementation "maven.modrinth:mafglib:${project.malilib_version}"
+    modLocalRuntime("com.github.ThinkingStudios:ForgedNetworkingAPI:0.1.0-mc1.20.4")
 
     implementation "com.google.code.findbugs:jsr305:3.0.2"
 }
@@ -70,12 +65,12 @@ modrinth {
 
     projectId = "${project.modrinth_id}"
     versionNumber = "${project.version}"
-    versionType = "beta"
+    versionType = "alpha"
     changelog = file("CHANGELOG.md").getText('UTF-8')
     uploadFile = remapJar
     additionalFiles = [sourcesJar]
-    gameVersions = ["1.20", "1.20.1"]
-    loaders = ["forge", "neoforge"]
+    gameVersions = ["1.20.3", "1.20.4"]
+    loaders = ["neoforge"]
     dependencies {
         required.project("mafglib")
     }
@@ -87,12 +82,12 @@ task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge)
 
     def mainFile = upload(project.curseforge_id, remapJar)
     mainFile.displayName = "${project.version}"
-    mainFile.releaseType = "beta"
+    mainFile.releaseType = "alpha"
     mainFile.changelog = file("CHANGELOG.md")
     mainFile.changelogType = "markdown"
-    mainFile.addModLoader("Forge", "NeoForge")
+    mainFile.addModLoader("NeoForge")
     mainFile.addJavaVersion("Java 17", "Java 18")
-    mainFile.addGameVersion("1.20", "1.20.1")
+    mainFile.addGameVersion("1.20.3", "1.20.4")
     mainFile.addRequirement("mafglib")
 
     def sourcesFile = mainFile.withAdditionalFile(sourcesJar)

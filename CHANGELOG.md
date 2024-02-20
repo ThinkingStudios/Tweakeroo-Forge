@@ -1,3 +1,2 @@
 ## Change
-- update mafglib to `0.1.8`
-- move `onProcessRightClickPost` from mixin to forge event
+- port to 1.20.4 NeoForge
