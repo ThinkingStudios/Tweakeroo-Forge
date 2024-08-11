@@ -81,11 +81,15 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       MAP_PREVIEW_REQUIRE_SHIFT           = new ConfigBoolean     ("mapPreviewRequireShift", true, "tweakeroo.config.generic.comment.mapPreviewRequireShift").translatedName("tweakeroo.config.generic.name.mapPreviewRequireShift");
         public static final ConfigInteger       MAP_PREVIEW_SIZE                    = new ConfigInteger     ("mapPreviewSize", 160, 16, 512, "tweakeroo.config.generic.comment.mapPreviewSize").translatedName("tweakeroo.config.generic.name.mapPreviewSize");
         public static final ConfigInteger       PERIODIC_ATTACK_INTERVAL            = new ConfigInteger     ("periodicAttackInterval", 20, 0, Integer.MAX_VALUE, "tweakeroo.config.generic.comment.periodicAttackInterval").translatedName("tweakeroo.config.generic.name.periodicAttackInterval");
+        public static final ConfigBoolean       PERIODIC_ATTACK_RESET_ON_ACTIVATE   = new ConfigBoolean     ("periodicAttackResetIntervalOnActivate", true, "tweakeroo.config.generic.comment.periodicAttackResetIntervalOnActivate").translatedName("tweakeroo.config.generic.name.periodicAttackResetIntervalOnActivate");
         public static final ConfigInteger       PERIODIC_USE_INTERVAL               = new ConfigInteger     ("periodicUseInterval", 20, 0, Integer.MAX_VALUE, "tweakeroo.config.generic.comment.periodicUseInterval").translatedName("tweakeroo.config.generic.name.periodicUseInterval");
+        public static final ConfigBoolean       PERIODIC_USE_RESET_ON_ACTIVATE      = new ConfigBoolean     ("periodicUseResetIntervalOnActivate", true, "tweakeroo.config.generic.comment.periodicUseResetIntervalOnActivate").translatedName("tweakeroo.config.generic.name.periodicUseResetIntervalOnActivate");
         public static final ConfigInteger       PERIODIC_HOLD_ATTACK_DURATION       = new ConfigInteger     ("periodicHoldAttackDuration", 20, 0, Integer.MAX_VALUE, "tweakeroo.config.generic.comment.periodicHoldAttackDuration").translatedName("tweakeroo.config.generic.name.periodicHoldAttackDuration");
         public static final ConfigInteger       PERIODIC_HOLD_ATTACK_INTERVAL       = new ConfigInteger     ("periodicHoldAttackInterval", 20, 0, Integer.MAX_VALUE, "tweakeroo.config.generic.comment.periodicHoldAttackInterval").translatedName("tweakeroo.config.generic.name.periodicHoldAttackInterval");
+        public static final ConfigBoolean       PERIODIC_HOLD_ATTACK_RESET_ON_ACTIVATE= new ConfigBoolean   ("periodicHoldAttackResetIntervalOnActivate", true, "tweakeroo.config.generic.comment.periodicHoldAttackResetIntervalOnActivate").translatedName("tweakeroo.config.generic.name.periodicHoldAttackResetIntervalOnActivate");
         public static final ConfigInteger       PERIODIC_HOLD_USE_DURATION          = new ConfigInteger     ("periodicHoldUseDuration", 20, 0, Integer.MAX_VALUE, "tweakeroo.config.generic.comment.periodicHoldUseDuration").translatedName("tweakeroo.config.generic.name.periodicHoldUseDuration");
         public static final ConfigInteger       PERIODIC_HOLD_USE_INTERVAL          = new ConfigInteger     ("periodicHoldUseInterval", 20, 0, Integer.MAX_VALUE, "tweakeroo.config.generic.comment.periodicHoldUseInterval").translatedName("tweakeroo.config.generic.name.periodicHoldUseInterval");
+        public static final ConfigBoolean       PERIODIC_HOLD_USE_RESET_ON_ACTIVATE = new ConfigBoolean     ("periodicHoldUseResetIntervalOnActivate", true, "tweakeroo.config.generic.comment.periodicHoldUseResetIntervalOnActivate").translatedName("tweakeroo.config.generic.name.periodicHoldUseResetIntervalOnActivate");
         public static final ConfigBoolean       PERMANENT_SNEAK_ALLOW_IN_GUIS       = new ConfigBoolean     ("permanentSneakAllowInGUIs", false, "tweakeroo.config.generic.comment.permanentSneakAllowInGUIs").translatedName("tweakeroo.config.generic.name.permanentSneakAllowInGUIs");
         public static final ConfigInteger       PLACEMENT_GRID_SIZE                 = new ConfigInteger     ("placementGridSize", 3, 1, 1000, "tweakeroo.config.generic.comment.placementGridSize").translatedName("tweakeroo.config.generic.name.placementGridSize");
         public static final ConfigInteger       PLACEMENT_LIMIT                     = new ConfigInteger     ("placementLimit", 3, 1, 10000, "tweakeroo.config.generic.comment.placementLimit").translatedName("tweakeroo.config.generic.name.placementLimit");
@@ -117,6 +121,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       WEAPON_SWAP_BETTER_ENCHANTS         = new ConfigBoolean     ("weaponSwapBetterEnchants", false, "tweakeroo.config.generic.comment.weaponSwapBetterEnchants").translatedName("tweakeroo.config.generic.name.weaponSwapBetterEnchants");
         public static final ConfigBoolean       ZOOM_ADJUST_MOUSE_SENSITIVITY       = new ConfigBoolean     ("zoomAdjustMouseSensitivity", true, "tweakeroo.config.generic.comment.zoomAdjustMouseSensitivity").translatedName("tweakeroo.config.generic.name.zoomAdjustMouseSensitivity");
         public static final ConfigDouble        ZOOM_FOV                            = new ConfigDouble      ("zoomFov", 30, 0.01, 359.99, "tweakeroo.config.generic.comment.zoomFov").translatedName("tweakeroo.config.generic.name.zoomFov");
+        public static final ConfigBoolean       ZOOM_RESET_FOV_ON_ACTIVATE          = new ConfigBoolean     ("zoomResetFovOnActivate", true, "tweakeroo.config.generic.comment.zoomResetFovOnActivate").translatedName("tweakeroo.config.generic.name.zoomResetFovOnActivate");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 ACCURATE_PLACEMENT_PROTOCOL_MODE,
@@ -181,11 +186,15 @@ public class Configs implements IConfigHandler
                 ITEM_SWAP_DURABILITY_THRESHOLD,
                 MAP_PREVIEW_SIZE,
                 PERIODIC_ATTACK_INTERVAL,
+                PERIODIC_ATTACK_RESET_ON_ACTIVATE,
                 PERIODIC_USE_INTERVAL,
+                PERIODIC_USE_RESET_ON_ACTIVATE,
                 PERIODIC_HOLD_ATTACK_DURATION,
                 PERIODIC_HOLD_ATTACK_INTERVAL,
+                PERIODIC_HOLD_ATTACK_RESET_ON_ACTIVATE,
                 PERIODIC_HOLD_USE_DURATION,
                 PERIODIC_HOLD_USE_INTERVAL,
+                PERIODIC_HOLD_USE_RESET_ON_ACTIVATE,
                 PLACEMENT_GRID_SIZE,
                 PLACEMENT_LIMIT,
                 POTION_WARNING_THRESHOLD,
@@ -201,7 +210,8 @@ public class Configs implements IConfigHandler
                 TOOL_SWITCH_IGNORED_SLOTS,
                 TOOL_SWAP_BETTER_ENCHANTS,
                 WEAPON_SWAP_BETTER_ENCHANTS,
-                ZOOM_FOV
+                ZOOM_FOV,
+                ZOOM_RESET_FOV_ON_ACTIVATE
         );
     }
 
@@ -227,6 +237,7 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList ENTITY_TYPE_ATTACK_RESTRICTION_LIST_TYPE = new ConfigOptionList("entityTypeAttackRestrictionListType", ListType.BLACKLIST, "tweakeroo.config.lists.comment.entityTypeAttackRestrictionListType").translatedName("tweakeroo.config.lists.name.entityTypeAttackRestrictionListType");
         public static final ConfigStringList ENTITY_TYPE_ATTACK_RESTRICTION_BLACKLIST = new ConfigStringList("entityTypeAttackRestrictionBlackList", ImmutableList.of("minecraft:villager"), "tweakeroo.config.lists.comment.entityTypeAttackRestrictionBlackList").translatedName("tweakeroo.config.lists.name.entityTypeAttackRestrictionBlackList");
         public static final ConfigStringList ENTITY_TYPE_ATTACK_RESTRICTION_WHITELIST = new ConfigStringList("entityTypeAttackRestrictionWhiteList", ImmutableList.of(), "tweakeroo.config.lists.comment.entityTypeAttackRestrictionWhiteList").translatedName("tweakeroo.config.lists.name.entityTypeAttackRestrictionWhiteList");
+        public static final ConfigStringList PREFER_SILK_TOUCH                  = new ConfigStringList("preferSilkTouch", ImmutableList.of("minecraft:ender_chest"), "tweakeroo.config.lists.comment.preferSilkTouch").translatedName("tweakeroo.config.lists.name.preferSilkTouch");
         public static final ConfigStringList ENTITY_WEAPON_MAPPING              = new ConfigStringList("entityWeaponMapping", ImmutableList.of("<default> => minecraft:mace, minecraft:netherite_sword, minecraft:diamond_sword, minecraft:iron_sword, minecraft:golden_sword, minecraft:stone_sword, minecraft:wooden_sword", "minecraft:end_crystal, minecraft:item_frame, minecraft:glow_item_frame, minecraft:leash_knot => <ignore>", "minecraft:minecart, minecraft:chest_minecart, minecraft:furnace_minecart, minecraft:hopper_minecart, minecraft:hopper_minecart, minecraft:spawner_minecart, minecraft:tnt_minecart, minecraft:boat=> minecraft:mace, minecraft:netherite_axe, minecraft:diamond_axe, minecraft:iron_axe, minecraft:golden_axe, minecraft:stone_axe, minecraft:wooden_axe"), "tweakeroo.config.lists.comment.entityWeaponMapping").translatedName("tweakeroo.config.lists.name.entityWeaponMapping");
         public static final ConfigOptionList FAST_PLACEMENT_ITEM_LIST_TYPE      = new ConfigOptionList("fastPlacementItemListType", ListType.BLACKLIST, "tweakeroo.config.lists.comment.fastPlacementItemListType").translatedName("tweakeroo.config.lists.name.fastPlacementItemListType");
         public static final ConfigStringList FAST_PLACEMENT_ITEM_BLACKLIST      = new ConfigStringList("fastPlacementItemBlackList", ImmutableList.of("minecraft:ender_chest", "minecraft:white_shulker_box"), "tweakeroo.config.lists.comment.fastPlacementItemBlackList").translatedName("tweakeroo.config.lists.name.fastPlacementItemBlackList");
@@ -255,6 +266,7 @@ public class Configs implements IConfigHandler
                 ENTITY_TYPE_ATTACK_RESTRICTION_LIST_TYPE,
                 ENTITY_TYPE_ATTACK_RESTRICTION_BLACKLIST,
                 ENTITY_TYPE_ATTACK_RESTRICTION_WHITELIST,
+                PREFER_SILK_TOUCH,
                 ENTITY_WEAPON_MAPPING,
                 FAST_PLACEMENT_ITEM_LIST_TYPE,
                 FAST_RIGHT_CLICK_BLOCK_LIST_TYPE,
@@ -394,14 +406,13 @@ public class Configs implements IConfigHandler
 
     public static ConfigDouble getActiveFlySpeedConfig()
     {
-        switch (Configs.Internal.FLY_SPEED_PRESET.getIntegerValue())
+        return switch (Internal.FLY_SPEED_PRESET.getIntegerValue())
         {
-            case 0:  return Configs.Generic.FLY_SPEED_PRESET_1;
-            case 1:  return Configs.Generic.FLY_SPEED_PRESET_2;
-            case 2:  return Configs.Generic.FLY_SPEED_PRESET_3;
-            case 3:  return Configs.Generic.FLY_SPEED_PRESET_4;
-            default: return Configs.Generic.FLY_SPEED_PRESET_1;
-        }
+            case 1 -> Generic.FLY_SPEED_PRESET_2;
+            case 2 -> Generic.FLY_SPEED_PRESET_3;
+            case 3 -> Generic.FLY_SPEED_PRESET_4;
+            default -> Generic.FLY_SPEED_PRESET_1;
+        };
     }
 
     public static void loadFromFile()
@@ -434,6 +445,7 @@ public class Configs implements IConfigHandler
         InventoryUtils.setRepairModeSlots(Lists.REPAIR_MODE_SLOTS.getStrings());
         InventoryUtils.setUnstackingItems(Lists.UNSTACKING_ITEMS.getStrings());
         InventoryUtils.setWeaponMapping(Lists.ENTITY_WEAPON_MAPPING.getStrings());
+        InventoryUtils.setPreferSilkTouchList(Lists.PREFER_SILK_TOUCH.getStrings());
 
         PlacementTweaks.BLOCK_TYPE_BREAK_RESTRICTION.setListType((ListType) Lists.BLOCK_TYPE_BREAK_RESTRICTION_LIST_TYPE.getOptionListValue());
         PlacementTweaks.BLOCK_TYPE_BREAK_RESTRICTION.setListContents(

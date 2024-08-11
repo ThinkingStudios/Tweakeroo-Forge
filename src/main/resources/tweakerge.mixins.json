@@ -82,5 +82,5 @@
   "mixinPriority": 990,
   "injectors": {
     "defaultRequire": 0
-	}
+  }
 }

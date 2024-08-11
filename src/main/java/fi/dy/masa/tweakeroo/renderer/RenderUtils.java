@@ -6,7 +6,6 @@ import org.joml.Matrix4fStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.CrafterBlock;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -21,8 +20,10 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
@@ -32,6 +33,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.tweakeroo.config.Configs;
@@ -146,7 +148,7 @@ public class RenderUtils
 
         Inventory inv = null;
         ShulkerBoxBlock shulkerBoxBlock = null;
-        CrafterBlock crafterBlock = null;
+        //CrafterBlock crafterBlock = null;
         LivingEntity entityLivingBase = null;
 
         if (trace.getType() == HitResult.Type.BLOCK)
@@ -200,6 +202,7 @@ public class RenderUtils
             }
         }
 
+        final boolean isWolf = (entityLivingBase instanceof WolfEntity);
         final int xCenter = GuiUtils.getScaledWindowWidth() / 2;
         final int yCenter = GuiUtils.getScaledWindowHeight() / 2;
         int x = xCenter - 52 / 2;
@@ -208,8 +211,8 @@ public class RenderUtils
         if (inv != null && inv.size() > 0)
         {
             final boolean isHorse = (entityLivingBase instanceof AbstractHorseEntity);
-            final int totalSlots = isHorse ? inv.size() - 2 : inv.size();
-            final int firstSlot = isHorse ? 2 : 0;
+            final int totalSlots = isHorse ? inv.size() - 1 : inv.size();
+            final int firstSlot = isHorse ? 1 : 0;
 
             final fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType type = (entityLivingBase instanceof VillagerEntity) ? fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType.VILLAGER : fi.dy.masa.malilib.render.InventoryOverlay.getInventoryType(inv);
             final fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties props = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryPropsTemp(type, totalSlots);
@@ -234,8 +237,13 @@ public class RenderUtils
 
             if (isHorse)
             {
+                Inventory horseInv = new SimpleInventory(2);
+                ItemStack horseArmor = (((AbstractHorseEntity) entityLivingBase).getBodyArmor());
+                horseInv.setStack(0, horseArmor != null && !horseArmor.isEmpty() ? horseArmor : ItemStack.EMPTY);
+                horseInv.setStack(1, inv.getStack(0));
+
                 fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc);
-                fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc, drawContext);
+                fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc, drawContext);
                 xInv += 32 + 4;
             }
 
@@ -244,6 +252,31 @@ public class RenderUtils
                 fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, totalSlots, mc);
                 fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, firstSlot, totalSlots, mc, drawContext);
             }
+        }
+
+        if (isWolf)
+        {
+            InventoryOverlay.InventoryRenderType type = InventoryOverlay.InventoryRenderType.HORSE;
+            final fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties props = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryPropsTemp(type, 2);
+            final int rows = (int) Math.ceil((double) 2 / props.slotsPerRow);
+            int xInv;
+            int yInv = yCenter - props.height - 6;
+
+            if (rows > 6)
+            {
+                yInv -= (rows - 6) * 18;
+                y -= (rows - 6) * 18;
+            }
+
+            x = xCenter - 55;
+            xInv = xCenter + 2;
+            yInv = Math.min(yInv, yCenter - 92);
+
+            Inventory wolfInv = new SimpleInventory(2);
+            ItemStack wolfArmor = ((WolfEntity) entityLivingBase).getBodyArmor();
+            wolfInv.setStack(0, wolfArmor != null && !wolfArmor.isEmpty() ? wolfArmor : ItemStack.EMPTY);
+            fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc);
+            fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, wolfInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc, drawContext);
         }
 
         if (entityLivingBase != null)

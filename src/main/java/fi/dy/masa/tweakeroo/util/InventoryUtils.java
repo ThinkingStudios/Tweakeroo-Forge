@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -53,6 +54,7 @@ public class InventoryUtils
     private static final HashSet<Item> UNSTACKING_ITEMS = new HashSet<>();
     private static final List<Integer> TOOL_SWITCHABLE_SLOTS = new ArrayList<>();
     private static final List<Integer> TOOL_SWITCH_IGNORED_SLOTS = new ArrayList<>();
+    private static final List<String> PREFER_SILK_TOUCH = new ArrayList<>();
     private static final HashMap<EntityType<?>, HashSet<Item>> WEAPON_MAPPING = new HashMap<>();
 
     public static void setToolSwitchableSlots(String configStr)
@@ -63,6 +65,12 @@ public class InventoryUtils
     public static void setToolSwitchIgnoreSlots(String configStr)
     {
         parseSlotsFromString(configStr, TOOL_SWITCH_IGNORED_SLOTS);
+    }
+
+    public static void setPreferSilkTouchList(List<String> names)
+    {
+        PREFER_SILK_TOUCH.clear();
+        PREFER_SILK_TOUCH.addAll(names);
     }
 
     public static void parseSlotsFromString(String configStr, Collection<Integer> output)
@@ -190,7 +198,7 @@ public class InventoryUtils
             HashSet<Item> weapons = new HashSet<>();
             String entities = split[0].trim();
             String items = split[1].trim();
-            
+
             if (items.equals("<ignore>") == false)
             {
                 for (String itemId : items.split(","))
@@ -565,6 +573,16 @@ public class InventoryUtils
 
         if (testedStack.isEmpty() == false)
         {
+            if (PREFER_SILK_TOUCH.contains(Registries.BLOCK.getEntry(state.getBlock()).getIdAsString()))
+            {
+                if (getEnchantmentLevel(testedStack, Enchantments.SILK_TOUCH) > 0 &&
+                    getEnchantmentLevel(previousTool, Enchantments.SILK_TOUCH) == -1 &&
+                    testedStack.isSuitableFor(state))
+                {
+                    return true;
+                }
+            }
+
             if (getBaseBlockBreakingSpeed(testedStack, state) > getBaseBlockBreakingSpeed(previousTool, state))
             {
                 return true;
@@ -592,15 +610,18 @@ public class InventoryUtils
     }
 
     /**
-     * Creates a total additive value of the essential Enchantment Levels
+     * Creates a total additive value of the essential Enchantment Levels.
      * If one of them does not contain the same Enchantment;
-     * then the level should be -1, and will reduce its total weighted value by 1.
+     * then the level should be -1, and will reduce its total weighted value;
+     * But if the enchantment level is better, then the weight is +1, and adds to it's value.
+     * The same Enchantment Level would then be a 0; and has no weighted change.
+     * The result is then in favor for the testedStack if the total weight is > 0.
      */
     private static boolean hasSameOrBetterToolEnchantments(ItemStack testedStack, ItemStack previousTool)
     {
         int count = 0;
 
-        // Core Tool Enchants, where Mending has the highest weighted value
+        // Core Tool Enchants
         count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
         count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
         count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.EFFICIENCY);
@@ -613,7 +634,7 @@ public class InventoryUtils
     {
         int count = 0;
 
-        // Core Weapon Enchantments, where Mending has the highest weighted value
+        // Core Weapon Enchantments
         count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
         count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
         count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.LOOTING);
@@ -965,7 +986,7 @@ public class InventoryUtils
     }
 
     /**
-     * 
+     *
      * Finds a slot with an identical item than <b>stackReference</b>, ignoring the durability
      * of damageable items. Does not allow crafting or armor slots or the offhand slot
      * in the ContainerPlayer container.
