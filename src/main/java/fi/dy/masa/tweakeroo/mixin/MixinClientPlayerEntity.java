@@ -1,9 +1,15 @@
 package fi.dy.masa.tweakeroo.mixin;
 
 import com.mojang.authlib.GameProfile;
+import fi.dy.masa.tweakeroo.util.InventoryUtils;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -33,9 +39,11 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Shadow public float prevNauseaIntensity;
     @Shadow public float nauseaIntensity;
+    @Shadow private boolean falling;
     private final DummyMovementInput dummyMovementInput = new DummyMovementInput(null);
     private Input realInput;
     private float realNauseaIntensity;
+    @Unique private ItemStack autoSwitchElytraChestplate = ItemStack.EMPTY;
 
     private MixinClientPlayerEntity(ClientWorld world, GameProfile profile)
     {
@@ -115,6 +123,63 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         if (Configs.Disable.DISABLE_DOUBLE_TAP_SPRINT.getBooleanValue())
         {
             this.ticksLeftToDoubleTapSprint = 0;
+        }
+    }
+
+    @Inject(method = "tickMovement",
+            at = @At(value = "INVOKE", shift = At.Shift.BEFORE,
+            target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEquippedStack(Lnet/minecraft/entity/EquipmentSlot;)Lnet/minecraft/item/ItemStack;"))
+    private void onFallFlyingCheckChestSlot(CallbackInfo ci)
+    {
+        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
+        {
+            // PlayerEntity#checkFallFlying
+            if (!this.isOnGround() && !this.isFallFlying() && !this.isInFluidType() && !this.hasStatusEffect(StatusEffects.LEVITATION))
+            {
+                if (!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA) ||
+                    this.getEquippedStack(EquipmentSlot.CHEST).getDamage() > this.getEquippedStack(EquipmentSlot.CHEST).getMaxDamage() - 10)
+                {
+                    InventoryUtils.equipBestElytra(this);
+                }
+            }
+        }
+        else
+        {
+            // reset auto switch item if the feature is disabled.
+            this.autoSwitchElytraChestplate = ItemStack.EMPTY;
+        }
+    }
+
+
+    @Inject(method = "onTrackedDataSet", at = @At("RETURN"))
+    private void onStopFlying(TrackedData<?> data, CallbackInfo ci)
+    {
+        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
+        {
+            if (FLAGS.equals(data) && this.falling)
+            {
+                if (!this.isFallFlying() && this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA))
+                {
+                    if (!this.autoSwitchElytraChestplate.isEmpty() && !this.autoSwitchElytraChestplate.isOf(Items.ELYTRA))
+                    {
+                        if (this.playerScreenHandler.getCursorStack().isEmpty())
+                        {
+                            int targetSlot = InventoryUtils.findSlotWithItem(this.playerScreenHandler, this.autoSwitchElytraChestplate, true, false);
+
+                            if (targetSlot >= 0)
+                            {
+                                InventoryUtils.swapItemToEquipmentSlot(this, EquipmentSlot.CHEST, targetSlot);
+                                this.autoSwitchElytraChestplate = ItemStack.EMPTY;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // if cached previous item is empty, try to swap back to the default chest plate.
+                        InventoryUtils.swapElytraAndChestPlate(this);
+                    }
+                }
+            }
         }
     }
 

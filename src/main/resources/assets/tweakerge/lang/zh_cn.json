@@ -166,6 +166,8 @@
 	"Enables an aim lock, locking the yaw and pitch rotations\nto the current values.\nThis is separate from the snap aim lock,\nwhich locks them to the snapped value.\nThis allows locking them \"freely\" to the current value.":"开启后会锁定当前视角。",
 	"tweakAngelBlock":"AngelBlock | 凭空放置",
 	"Enables an \"Angel Block\" tweak, which allows\nplacing blocks in mid-air in Creative mode":"此功能将让你能够在空中放置方块。\n§6该功能仅在创造模式生效。§f",
+	"tweakAutoSwitchElytra":"AutoSwitchElytra | 自动切换鞘翅",
+	"Automatically switches to the Elytra when falling\\nand back to the previous chest equipment when landing.": "当玩家腾空时自动切换到鞘翅，并在着陆时切换回之前的胸甲。",
 	"tweakBlockReachOverride":"BlockReachOverride | 方块放置间距",
 	"Overrides the block reach distance with\nthe one set in Generic -> blockReachDistance":"在通用当功能中的“blockReachDistance”设置放置距离\n将覆盖默认的放置距离",
 	"tweakBreakingGrid":"BreakingGrid | 破坏间距限制",
