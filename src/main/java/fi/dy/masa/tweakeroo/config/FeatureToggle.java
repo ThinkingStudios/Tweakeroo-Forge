@@ -28,6 +28,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     TWEAK_BLOCK_TYPE_BREAK_RESTRICTION("tweakBlockTypeBreakRestriction",    false, ""),
     TWEAK_BREAKING_GRID             ("tweakBreakingGrid",                   false, "",    KeybindSettings.INGAME_BOTH),
     TWEAK_BREAKING_RESTRICTION      ("tweakBreakingRestriction",            false, ""),
+    TWEAK_BUNDLE_DISPLAY            ("tweakBundleDisplay",                  false, ""),
     TWEAK_CHAT_BACKGROUND_COLOR     ("tweakChatBackgroundColor",            false, ""),
     TWEAK_CHAT_PERSISTENT_TEXT      ("tweakChatPersistentText",             false, ""),
     TWEAK_CHAT_TIMESTAMP            ("tweakChatTimestamp",                  false, ""),
@@ -89,6 +90,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     TWEAK_REPAIR_MODE               ("tweakRepairMode",                     false, ""),
     TWEAK_SCULK_PULSE_LENGTH        ("tweakSculkPulseLength",               false, true, ""),
     TWEAK_SERVER_DATA_SYNC          ("tweakServerDataSync",                 false, ""),
+    TWEAK_SERVER_DATA_SYNC_BACKUP   ("tweakServerDataSyncBackup",           false, ""),
     TWEAK_SHULKERBOX_DISPLAY        ("tweakShulkerBoxDisplay",              false, ""),
     TWEAK_SIGN_COPY                 ("tweakSignCopy",                       false, ""),
     TWEAK_SNAP_AIM                  ("tweakSnapAim",                        false, "",    KeybindSettings.INGAME_BOTH),
@@ -118,25 +120,25 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     FeatureToggle(String name, boolean defaultValue, String defaultHotkey)
     {
         this(name, defaultValue, false, defaultHotkey, KeybindSettings.DEFAULT,
-                Reference.ORIGINAL_ID+".config.feature_toggle.comment."+name,
-                Reference.ORIGINAL_ID+".config.feature_toggle.prettyName."+name,
-                Reference.ORIGINAL_ID+".config.feature_toggle.name."+name);
+                Reference.ID+".config.feature_toggle.comment."+name,
+                Reference.ID+".config.feature_toggle.prettyName."+name,
+                Reference.ID+".config.feature_toggle.name."+name);
     }
 
     FeatureToggle(String name, boolean defaultValue, String defaultHotkey, KeybindSettings settings)
     {
         this(name, defaultValue, false, defaultHotkey, settings,
-                Reference.ORIGINAL_ID+".config.feature_toggle.comment."+name,
-                Reference.ORIGINAL_ID+".config.feature_toggle.prettyName."+name,
-                Reference.ORIGINAL_ID+".config.feature_toggle.name."+name);
+                Reference.ID+".config.feature_toggle.comment."+name,
+                Reference.ID+".config.feature_toggle.prettyName."+name,
+                Reference.ID+".config.feature_toggle.name."+name);
     }
 
     FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey)
     {
         this(name, defaultValue, singlePlayer, defaultHotkey, KeybindSettings.DEFAULT,
-                Reference.ORIGINAL_ID+".config.feature_toggle.comment."+name,
-                Reference.ORIGINAL_ID+".config.feature_toggle.prettyName."+name,
-                Reference.ORIGINAL_ID+".config.feature_toggle.name."+name);
+                Reference.ID+".config.feature_toggle.comment."+name,
+                Reference.ID+".config.feature_toggle.prettyName."+name,
+                Reference.ID+".config.feature_toggle.name."+name);
     }
 
     FeatureToggle(String name, boolean defaultValue, String defaultHotkey, String comment, String prettyName, String translatedName)
@@ -160,32 +162,32 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     {
         this(name, defaultValue, false, defaultHotkey, KeybindSettings.DEFAULT,
                 comment,
-                Reference.ORIGINAL_ID+".config.feature_toggle.prettyName."+name,
-                Reference.ORIGINAL_ID+".config.feature_toggle.name."+name);
+                Reference.ID+".config.feature_toggle.prettyName."+name,
+                Reference.ID+".config.feature_toggle.name."+name);
     }
 
     FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, String comment)
     {
         this(name, defaultValue, singlePlayer, defaultHotkey, KeybindSettings.DEFAULT,
                 comment,
-                Reference.ORIGINAL_ID+".config.feature_toggle.prettyName."+name,
-                Reference.ORIGINAL_ID+".config.feature_toggle.name."+name);
+                Reference.ID+".config.feature_toggle.prettyName."+name,
+                Reference.ID+".config.feature_toggle.name."+name);
     }
 
     FeatureToggle(String name, boolean defaultValue, String defaultHotkey, KeybindSettings settings, String comment)
     {
         this(name, defaultValue, false, defaultHotkey, settings,
                 comment,
-                Reference.ORIGINAL_ID+".config.feature_toggle.prettyName."+name,
-                Reference.ORIGINAL_ID+".config.feature_toggle.name."+name);
+                Reference.ID+".config.feature_toggle.prettyName."+name,
+                Reference.ID+".config.feature_toggle.name."+name);
     }
 
     FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, KeybindSettings settings, String comment)
     {
         this(name, defaultValue, singlePlayer, defaultHotkey, settings,
                 comment,
-                Reference.ORIGINAL_ID+".config.feature_toggle.prettyName."+name,
-                Reference.ORIGINAL_ID+".config.feature_toggle.name."+name);
+                Reference.ID+".config.feature_toggle.prettyName."+name,
+                Reference.ID+".config.feature_toggle.name."+name);
     }
 
     FeatureToggle(String name, boolean defaultValue, String defaultHotkey, String comment, String prettyName)
@@ -193,7 +195,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
         this(name, defaultValue, false, defaultHotkey,
                 comment,
                 prettyName,
-                Reference.ORIGINAL_ID+".config.feature_toggle.name."+name);
+                Reference.ID+".config.feature_toggle.name."+name);
     }
 
     FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, String comment, String prettyName)
@@ -201,7 +203,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
         this(name, defaultValue, singlePlayer, defaultHotkey, KeybindSettings.DEFAULT,
                 comment,
                 prettyName,
-                Reference.ORIGINAL_ID+".config.feature_toggle.name."+name);
+                Reference.ID+".config.feature_toggle.name."+name);
     }
 
     FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, KeybindSettings settings, String comment, String prettyName)
@@ -209,7 +211,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
         this(name, defaultValue, singlePlayer, defaultHotkey, settings,
                 comment,
                 prettyName,
-                Reference.ORIGINAL_ID+".config.feature_toggle.name."+name);
+                Reference.ID+".config.feature_toggle.name."+name);
     }
     // Backwards Compatible constructors - END
 

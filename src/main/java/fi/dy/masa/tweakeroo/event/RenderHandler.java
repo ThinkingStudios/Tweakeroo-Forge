@@ -15,6 +15,7 @@ import net.minecraft.util.hit.HitResult;
 
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRenderer;
+import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.util.ActiveMode;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.InventoryUtils;
@@ -22,6 +23,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
+import fi.dy.masa.tweakeroo.util.RayTraceUtils;
 
 public class RenderHandler implements IRenderer
 {
@@ -44,7 +46,14 @@ public class RenderHandler implements IRenderer
         if (FeatureToggle.TWEAK_INVENTORY_PREVIEW.getBooleanValue() &&
             Hotkeys.INVENTORY_PREVIEW.getKeybind().isKeybindHeld())
         {
-            RenderUtils.renderInventoryOverlay(mc, drawContext);
+            InventoryOverlay.Context context = RayTraceUtils.getTargetInventory(mc);
+
+            if (context != null)
+            {
+                RenderUtils.renderInventoryOverlay(context, drawContext);
+            }
+
+            //RenderUtils.renderInventoryOverlay(mc, drawContext);
         }
 
         if (FeatureToggle.TWEAK_PLAYER_INVENTORY_PEEK.getBooleanValue() &&
@@ -90,20 +99,28 @@ public class RenderHandler implements IRenderer
                 fi.dy.masa.malilib.render.RenderUtils.renderShulkerBoxPreview(stack, x, y, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue(), drawContext);
             }
         }
+        else if (stack.getComponents().contains(DataComponentTypes.BUNDLE_CONTENTS) && InventoryUtils.bundleHasItems(stack))
+        {
+            if (FeatureToggle.TWEAK_BUNDLE_DISPLAY.getBooleanValue() &&
+                (Configs.Generic.BUNDLE_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown()))
+            {
+                fi.dy.masa.malilib.render.RenderUtils.renderBundlePreview(stack, x, y, Configs.Generic.BUNDLE_DISPLAY_BACKGROUND_COLOR.getBooleanValue(), drawContext);
+            }
+        }
     }
 
     @Override
-    public void onRenderWorldLast(Matrix4f matrix4f, Matrix4f projMatrix)
+    public void onRenderWorldLast(Matrix4f posMatrix, Matrix4f projMatrix)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
         if (mc.player != null)
         {
-            this.renderOverlays(matrix4f, mc);
+            this.renderOverlays(posMatrix, mc);
         }
     }
 
-    private void renderOverlays(Matrix4f matrix4f, MinecraftClient mc)
+    private void renderOverlays(Matrix4f posMatrix, MinecraftClient mc)
     {
         Entity entity = mc.getCameraEntity();
 
@@ -130,7 +147,7 @@ public class RenderHandler implements IRenderer
                     hitResult.getSide(),
                     hitResult.getPos(),
                     color,
-                    matrix4f,
+                    posMatrix,
                     mc);
 
             RenderSystem.enableDepthTest();

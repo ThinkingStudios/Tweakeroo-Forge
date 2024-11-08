@@ -3,6 +3,7 @@ package fi.dy.masa.tweakeroo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import fi.dy.masa.malilib.event.InitializationHandler;
+import fi.dy.masa.tweakeroo.config.Configs;
 
 public class Tweakeroo
 {
@@ -16,13 +17,11 @@ public class Tweakeroo
         InitializationHandler.getInstance().registerInitializationHandler(new InitHandler());
     }
 
-    /*
-    public static void debugLog(String msg, Object... args)
+    public static void printDebug(String msg, Object... args)
     {
         if (Configs.Generic.DEBUG_LOGGING.getBooleanValue())
         {
             Tweakeroo.logger.info(msg, args);
         }
     }
-     */
 }

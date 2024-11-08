@@ -45,11 +45,13 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList    BLOCK_TYPE_BREAK_RESTRICTION_WARN   = new ConfigOptionList  ("blockTypeBreakRestrictionWarn", MessageOutputType.MESSAGE, "tweakeroo.config.generic.comment.blockTypeBreakRestrictionWarn").translatedName("tweakeroo.config.generic.name.blockTypeBreakRestrictionWarn");
         public static final ConfigInteger       BREAKING_GRID_SIZE                  = new ConfigInteger     ("breakingGridSize", 3, 1, 1000, "tweakeroo.config.generic.comment.breakingGridSize").translatedName("tweakeroo.config.generic.name.breakingGridSize");
         public static final ConfigOptionList    BREAKING_RESTRICTION_MODE           = new ConfigOptionList  ("breakingRestrictionMode", PlacementRestrictionMode.LINE, "tweakeroo.config.generic.comment.breakingRestrictionMode").translatedName("tweakeroo.config.generic.name.breakingRestrictionMode");
+        public static final ConfigBoolean       BUNDLE_DISPLAY_BACKGROUND_COLOR     = new ConfigBoolean     ("bundleDisplayBgColor", true, "tweakeroo.config.generic.comment.bundleDisplayBgColor").translatedName("tweakeroo.config.generic.name.bundleDisplayBgColor");
+        public static final ConfigBoolean       BUNDLE_DISPLAY_REQUIRE_SHIFT        = new ConfigBoolean     ("bundleDisplayRequireShift", true, "tweakeroo.config.generic.comment.bundleDisplayRequireShift").translatedName("tweakeroo.config.generic.name.bundleDisplayRequireShift");
         public static final ConfigColor         CHAT_BACKGROUND_COLOR               = new ConfigColor       ("chatBackgroundColor", "#80000000", "tweakeroo.config.generic.comment.chatBackgroundColor").translatedName("tweakeroo.config.generic.name.chatBackgroundColor");
         public static final ConfigString        CHAT_TIME_FORMAT                    = new ConfigString      ("chatTimeFormat", "[HH:mm:ss]", "tweakeroo.config.generic.comment.chatTimeFormat").translatedName("tweakeroo.config.generic.name.chatTimeFormat");
         public static final ConfigBoolean       CLIENT_PLACEMENT_ROTATION           = new ConfigBoolean     ("clientPlacementRotation", true, "tweakeroo.config.generic.comment.clientPlacementRotation").translatedName("tweakeroo.config.generic.name.clientPlacementRotation");
         public static final ConfigInteger       CUSTOM_INVENTORY_GUI_SCALE          = new ConfigInteger     ("customInventoryGuiScale", 2, 1, 10, "tweakeroo.config.generic.comment.customInventoryGuiScale").translatedName("tweakeroo.config.generic.name.customInventoryGuiScale");
-        //public static final ConfigBoolean       DEBUG_LOGGING                       = new ConfigBoolean     ("debugLogging", false, "tweakeroo.config.generic.comment.debugLogging").translatedName("tweakeroo.config.generic.name.debugLogging");
+        public static final ConfigBoolean       DEBUG_LOGGING                       = new ConfigBoolean     ("debugLogging", false, "tweakeroo.config.generic.comment.debugLogging").translatedName("tweakeroo.config.generic.name.debugLogging");
         public static final ConfigOptionList    ELYTRA_CAMERA_INDICATOR             = new ConfigOptionList  ("elytraCameraIndicator", ActiveMode.WITH_KEY, "tweakeroo.config.generic.comment.elytraCameraIndicator").translatedName("tweakeroo.config.generic.name.elytraCameraIndicator");
         public static final ConfigDouble        ENTITY_REACH_DISTANCE               = new ConfigDouble      ("entityReachDistance", 3.0, 1, 64, "tweakeroo.config.generic.comment.entityReachDistance").translatedName("tweakeroo.config.generic.name.entityReachDistance");
         public static final ConfigOptionList    ENTITY_TYPE_ATTACK_RESTRICTION_WARN = new ConfigOptionList  ("entityTypeAttackRestrictionWarn", MessageOutputType.MESSAGE, "tweakeroo.config.generic.comment.entityTypeAttackRestrictionWarn").translatedName("tweakeroo.config.generic.name.entityTypeAttackRestrictionWarn");
@@ -101,6 +103,7 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       RENDER_LIMIT_ITEM                   = new ConfigInteger     ("renderLimitItem", -1, -1, 10000, "tweakeroo.config.generic.comment.renderLimitItem").translatedName("tweakeroo.config.generic.name.renderLimitItem");
         public static final ConfigInteger       RENDER_LIMIT_XP_ORB                 = new ConfigInteger     ("renderLimitXPOrb", -1, -1, 10000, "tweakeroo.config.generic.comment.renderLimitXPOrb").translatedName("tweakeroo.config.generic.name.renderLimitXPOrb");
         public static final ConfigInteger       SCULK_SENSOR_PULSE_LENGTH           = new ConfigInteger     ("sculkSensorPulseLength", 40, 0, 10000, "tweakeroo.config.generic.comment.sculkSensorPulseLength").translatedName("tweakeroo.config.generic.name.sculkSensorPulseLength");
+        public static final ConfigInteger       SERVER_NBT_REQUEST_RATE             = new ConfigInteger     ("serverNbtRequestRate", 2, "tweakeroo.config.generic.comment.serverNbtRequestRate").translatedName("tweakeroo.config.generic.name.serverNbtRequestRate");
         public static final ConfigBoolean       SHULKER_DISPLAY_BACKGROUND_COLOR    = new ConfigBoolean     ("shulkerDisplayBgColor", true, "tweakeroo.config.generic.comment.shulkerDisplayBgColor").translatedName("tweakeroo.config.generic.name.shulkerDisplayBgColor");
         public static final ConfigBoolean       SHULKER_DISPLAY_REQUIRE_SHIFT       = new ConfigBoolean     ("shulkerDisplayRequireShift", true, "tweakeroo.config.generic.comment.shulkerDisplayRequireShift").translatedName("tweakeroo.config.generic.name.shulkerDisplayRequireShift");
         public static final ConfigBoolean       SLOT_SYNC_WORKAROUND                = new ConfigBoolean     ("slotSyncWorkaround", true, "tweakeroo.config.generic.comment.slotSyncWorkaround").translatedName("tweakeroo.config.generic.name.slotSyncWorkaround");
@@ -126,8 +129,10 @@ public class Configs implements IConfigHandler
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 ACCURATE_PLACEMENT_PROTOCOL_MODE,
                 ACCURATE_PLACEMENT_PROTOCOL,
+                BUNDLE_DISPLAY_BACKGROUND_COLOR,
+                BUNDLE_DISPLAY_REQUIRE_SHIFT,
                 CLIENT_PLACEMENT_ROTATION,
-                //DEBUG_LOGGING,
+                DEBUG_LOGGING,
                 FAST_LEFT_CLICK_ALLOW_TOOLS,
                 FAST_PLACEMENT_REMEMBER_ALWAYS,
                 FREE_CAMERA_PLAYER_INPUTS,
@@ -201,6 +206,7 @@ public class Configs implements IConfigHandler
                 RENDER_LIMIT_ITEM,
                 RENDER_LIMIT_XP_ORB,
                 SCULK_SENSOR_PULSE_LENGTH,
+                SERVER_NBT_REQUEST_RATE,
                 SNAP_AIM_PITCH_STEP,
                 SNAP_AIM_THRESHOLD_PITCH,
                 SNAP_AIM_THRESHOLD_YAW,
@@ -248,7 +254,7 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList FAST_RIGHT_CLICK_ITEM_LIST_TYPE    = new ConfigOptionList("fastRightClickListType", ListType.NONE, "tweakeroo.config.lists.comment.fastRightClickListType").translatedName("tweakeroo.config.lists.name.fastRightClickListType");
         public static final ConfigStringList FAST_RIGHT_CLICK_ITEM_BLACKLIST    = new ConfigStringList("fastRightClickBlackList", ImmutableList.of("minecraft:firework_rocket"), "tweakeroo.config.lists.comment.fastRightClickBlackList").translatedName("tweakeroo.config.lists.name.fastRightClickBlackList");
         public static final ConfigStringList FAST_RIGHT_CLICK_ITEM_WHITELIST    = new ConfigStringList("fastRightClickWhiteList", ImmutableList.of("minecraft:bucket", "minecraft:water_bucket", "minecraft:lava_bucket", "minecraft:glass_bottle"), "tweakeroo.config.lists.comment.fastRightClickWhiteList").translatedName("tweakeroo.config.lists.name.fastRightClickWhiteList");
-        public static final ConfigStringList FLAT_WORLD_PRESETS                 = new ConfigStringList("flatWorldPresets", ImmutableList.of("White Glass;1*minecraft:white_stained_glass;minecraft:plains;;minecraft:white_stained_glass", "Glass;1*minecraft:glass;minecraft:plains;;minecraft:glass"), "tweakeroo.config.lists.comment.flatWorldPresets").translatedName("tweakeroo.config.lists.name.flatWorldPresets");
+        //public static final ConfigStringList FLAT_WORLD_PRESETS                 = new ConfigStringList("flatWorldPresets", ImmutableList.of("White Glass;1*minecraft:white_stained_glass;minecraft:plains;;minecraft:white_stained_glass", "Glass;1*minecraft:glass;minecraft:plains;;minecraft:glass"), "tweakeroo.config.lists.comment.flatWorldPresets").translatedName("tweakeroo.config.lists.name.flatWorldPresets");
         public static final ConfigOptionList HAND_RESTOCK_LIST_TYPE             = new ConfigOptionList("handRestockListType", ListType.NONE, "tweakeroo.config.lists.comment.handRestockListType").translatedName("tweakeroo.config.lists.name.handRestockListType");
         public static final ConfigStringList HAND_RESTOCK_BLACKLIST             = new ConfigStringList("handRestockBlackList", ImmutableList.of("minecraft:bucket", "minecraft:lava_bucket", "minecraft:water_bucket"), "tweakeroo.config.lists.comment.handRestockBlackList").translatedName("tweakeroo.config.lists.name.handRestockBlackList");
         public static final ConfigStringList HAND_RESTOCK_WHITELIST             = new ConfigStringList("handRestockWhiteList", ImmutableList.of(), "tweakeroo.config.lists.comment.handRestockWhiteList").translatedName("tweakeroo.config.lists.name.handRestockWhiteList");
@@ -278,7 +284,7 @@ public class Configs implements IConfigHandler
                 FAST_RIGHT_CLICK_BLOCK_WHITELIST,
                 FAST_RIGHT_CLICK_ITEM_BLACKLIST,
                 FAST_RIGHT_CLICK_ITEM_WHITELIST,
-                FLAT_WORLD_PRESETS,
+                //FLAT_WORLD_PRESETS,
                 HAND_RESTOCK_LIST_TYPE,
                 HAND_RESTOCK_BLACKLIST,
                 HAND_RESTOCK_WHITELIST,

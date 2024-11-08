@@ -25,7 +25,7 @@ public class MixinDataQueryHandler
     {
         if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
         {
-            ServerDataSyncer.getInstance().handleQueryResponse(transactionId, nbt);
+            ServerDataSyncer.getInstance().handleVanillaQueryNbt(transactionId, nbt);
         }
     }
 }

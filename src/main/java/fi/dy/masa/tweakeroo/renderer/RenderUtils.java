@@ -1,12 +1,14 @@
 package fi.dy.masa.tweakeroo.renderer;
 
+import java.util.HashSet;
 import java.util.Set;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
+
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.ShulkerBoxBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.CrafterBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -25,23 +27,15 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+
 import fi.dy.masa.malilib.render.InventoryOverlay;
-import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
-import fi.dy.masa.tweakeroo.mixin.IMixinAbstractHorseEntity;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
-import fi.dy.masa.tweakeroo.util.RayTraceUtils;
 import fi.dy.masa.tweakeroo.util.SnapAimMode;
 
 public class RenderUtils
@@ -122,6 +116,7 @@ public class RenderUtils
         }
     }
 
+    /*
     public static void renderInventoryOverlay(MinecraftClient mc, DrawContext drawContext)
     {
         World world = fi.dy.masa.malilib.util.WorldUtils.getBestWorld(mc);
@@ -283,6 +278,151 @@ public class RenderUtils
         {
             fi.dy.masa.malilib.render.InventoryOverlay.renderEquipmentOverlayBackground(x, y, entityLivingBase, drawContext);
             fi.dy.masa.malilib.render.InventoryOverlay.renderEquipmentStacks(entityLivingBase, x, y, mc, drawContext);
+        }
+    }
+     */
+
+    public static void renderInventoryOverlay(InventoryOverlay.Context context, DrawContext drawContext)
+    {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        LivingEntity entityLivingBase = null;
+        BlockEntity be = null;
+        Inventory inv = null;
+        NbtCompound nbt = new NbtCompound();
+
+        if (context.be() != null)
+        {
+            be = context.be();
+        }
+        else if (context.entity() != null)
+        {
+            if (context.entity() instanceof LivingEntity)
+            {
+                entityLivingBase = context.entity();
+            }
+        }
+        if (context.inv() != null)
+        {
+            inv = context.inv();
+        }
+        if (context.nbt() != null)
+        {
+            nbt.copyFrom(context.nbt());
+        }
+
+        //Tweakeroo.logger.error("render: ctx-type [{}], inv [{}], raw Nbt [{}]", context.type().toString(), inv != null ? inv.size() : "null", nbt.isEmpty() ? "empty" : nbt.toString());
+
+        final boolean isWolf = (entityLivingBase instanceof WolfEntity);
+        final int xCenter = GuiUtils.getScaledWindowWidth() / 2;
+        final int yCenter = GuiUtils.getScaledWindowHeight() / 2;
+        int x = xCenter - 52 / 2;
+        int y = yCenter - 92;
+        if (inv != null && inv.size() > 0)
+        {
+            final boolean isHorse = (entityLivingBase instanceof AbstractHorseEntity);
+            final int totalSlots = isHorse ? inv.size() - 1 : inv.size();
+            final int firstSlot = isHorse ? 1 : 0;
+
+            InventoryOverlay.InventoryRenderType type = (entityLivingBase instanceof VillagerEntity) ? InventoryOverlay.InventoryRenderType.VILLAGER : InventoryOverlay.getBestInventoryType(inv, nbt, context);
+            final InventoryOverlay.InventoryProperties props = InventoryOverlay.getInventoryPropsTemp(type, totalSlots);
+            final int rows = (int) Math.ceil((double) totalSlots / props.slotsPerRow);
+            Set<Integer> lockedSlots = new HashSet<>();
+            int xInv = xCenter - (props.width / 2);
+            int yInv = yCenter - props.height - 6;
+
+            if (rows > 6)
+            {
+                yInv -= (rows - 6) * 18;
+                y -= (rows - 6) * 18;
+            }
+            if (entityLivingBase != null)
+            {
+                x = xCenter - 55;
+                xInv = xCenter + 2;
+                yInv = Math.min(yInv, yCenter - 92);
+            }
+
+            if (be != null && type == InventoryOverlay.InventoryRenderType.CRAFTER)
+            {
+                if (be instanceof CrafterBlockEntity cbe)
+                {
+                    lockedSlots = BlockUtils.getDisabledSlots(cbe);
+                }
+                else if (context.nbt() != null)
+                {
+                    lockedSlots = BlockUtils.getDisabledSlotsFromNbt(context.nbt());
+                }
+            }
+
+            //Tweakeroo.logger.warn("renderInventoryOverlay: type [{}] // Nbt Type [{}]", type.toString(), context.nbt() != null ? InventoryOverlay.getInventoryType(context.nbt()) : "INVALID");
+
+            if (context.be() != null && context.be().getCachedState().getBlock() instanceof ShulkerBoxBlock sbb)
+            {
+                fi.dy.masa.malilib.render.RenderUtils.setShulkerboxBackgroundTintColor(sbb, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
+            }
+
+            if (isHorse)
+            {
+                Inventory horseInv = new SimpleInventory(2);
+                ItemStack horseArmor = (((AbstractHorseEntity) entityLivingBase).getBodyArmor());
+                horseInv.setStack(0, horseArmor != null && !horseArmor.isEmpty() ? horseArmor : ItemStack.EMPTY);
+                horseInv.setStack(1, inv.getStack(0));
+
+                InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc);
+                /*
+                if (type == InventoryOverlay.InventoryRenderType.LLAMA)
+                {
+                    InventoryOverlay.renderLlamaArmorBackgroundSlots(horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, drawContext);
+                }
+                else
+                {
+                    InventoryOverlay.renderHorseArmorBackgroundSlots(horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, drawContext);
+                }
+                 */
+                InventoryOverlay.renderInventoryStacks(type, horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc, drawContext);
+                xInv += 32 + 4;
+            }
+
+            if (totalSlots > 0)
+            {
+                InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, totalSlots, mc);
+                /*
+                if (type == InventoryOverlay.InventoryRenderType.BREWING_STAND)
+                {
+                    InventoryOverlay.renderBrewerBackgroundSlots(inv, xInv, yInv, drawContext);
+                }
+                 */
+                InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, firstSlot, totalSlots, lockedSlots, mc, drawContext);
+            }
+        }
+
+        if (isWolf)
+        {
+            InventoryOverlay.InventoryRenderType type = InventoryOverlay.InventoryRenderType.HORSE;
+            final InventoryOverlay.InventoryProperties props = InventoryOverlay.getInventoryPropsTemp(type, 2);
+            final int rows = (int) Math.ceil((double) 2 / props.slotsPerRow);
+            int xInv;
+            int yInv = yCenter - props.height - 6;
+            if (rows > 6)
+            {
+                yInv -= (rows - 6) * 18;
+                y -= (rows - 6) * 18;
+            }
+            x = xCenter - 55;
+            xInv = xCenter + 2;
+            yInv = Math.min(yInv, yCenter - 92);
+            Inventory wolfInv = new SimpleInventory(2);
+            ItemStack wolfArmor = ((WolfEntity) entityLivingBase).getBodyArmor();
+            wolfInv.setStack(0, wolfArmor != null && !wolfArmor.isEmpty() ? wolfArmor : ItemStack.EMPTY);
+            InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc);
+            //InventoryOverlay.renderWolfArmorBackgroundSlots(wolfInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, drawContext);
+            InventoryOverlay.renderInventoryStacks(type, wolfInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc, drawContext);
+        }
+
+        if (entityLivingBase != null)
+        {
+            InventoryOverlay.renderEquipmentOverlayBackground(x, y, entityLivingBase, drawContext);
+            InventoryOverlay.renderEquipmentStacks(entityLivingBase, x, y, mc, drawContext);
         }
     }
 
