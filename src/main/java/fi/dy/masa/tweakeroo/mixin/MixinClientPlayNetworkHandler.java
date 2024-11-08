@@ -43,7 +43,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
     }
 
     @Inject(method = "onDeathMessage", at = @At(value = "INVOKE", // onCombatEvent
-                                                target = "Lnet/minecraft/client/MinecraftClient;setScreen(Lnet/minecraft/client/gui/screen/Screen;)V"))
+            target = "Lnet/minecraft/client/MinecraftClient;setScreen(Lnet/minecraft/client/gui/screen/Screen;)V"))
     private void onPlayerDeath(DeathMessageS2CPacket packetIn, CallbackInfo ci)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
@@ -67,12 +67,15 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
         }
     }
 
-    @Inject(
-            method = "onEntityStatus",
-            at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;getActiveTotemOfUndying(Lnet/minecraft/entity/player/PlayerEntity;)Lnet/minecraft/item/ItemStack;")
-    )
+    @Inject(method = "onEntityStatus",
+            at = @At(value = "INVOKE", ordinal = 0,
+            target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;getActiveDeathProtector(Lnet/minecraft/entity/player/PlayerEntity;)Lnet/minecraft/item/ItemStack;"))
     private void onPlayerUseTotemOfUndying(EntityStatusS2CPacket packet, CallbackInfo ci)
     {
+        if (this.client.player == null)
+        {
+            return;
+        }
         if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue())
         {
             for (Hand hand : Hand.values())

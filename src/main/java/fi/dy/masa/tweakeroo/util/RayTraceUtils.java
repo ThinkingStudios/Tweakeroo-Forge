@@ -3,8 +3,8 @@ package fi.dy.masa.tweakeroo.util;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import com.llamalad7.mixinextras.lib.apache.commons.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -32,10 +32,8 @@ import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 import fi.dy.masa.malilib.render.InventoryOverlay;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.EntityUtils;
-import fi.dy.masa.malilib.util.NbtKeys;
-import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.InventoryUtils;
+import fi.dy.masa.malilib.util.*;
 import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
 import fi.dy.masa.tweakeroo.mixin.IMixinAbstractHorseEntity;
 import fi.dy.masa.tweakeroo.mixin.IMixinPiglinEntity;
@@ -275,15 +273,15 @@ public class RayTraceUtils
                     //inv.size() == 1 &&
                     nbt.contains(NbtKeys.ITEMS) &&
                     nbt.getList(NbtKeys.ITEMS, Constants.NBT.TAG_COMPOUND).size() > 1)
-            //!DataManager.getInstance().hasIntegratedServer())
+                    //!DataManager.getInstance().hasIntegratedServer())
             {
                 if (entity instanceof AbstractHorseEntity)
                 {
-                    inv2 = fi.dy.masa.malilib.util.InventoryUtils.getNbtInventoryHorseFix(nbt, -1, entity.getRegistryManager());
+                    inv2 = InventoryUtils.getNbtInventoryHorseFix(nbt, -1, entity.getRegistryManager());
                 }
                 else
                 {
-                    inv2 = fi.dy.masa.malilib.util.InventoryUtils.getNbtInventory(nbt, -1, entity.getRegistryManager());
+                    inv2 = InventoryUtils.getNbtInventory(nbt, -1, entity.getRegistryManager());
                 }
                 inv = null;
             }
@@ -291,23 +289,23 @@ public class RayTraceUtils
             else if (inv != null &&
                     //inv.size() == 1 &&
                     nbt.contains(NbtKeys.SADDLE))
-            //!DataManager.getInstance().hasIntegratedServer())
+                    //!DataManager.getInstance().hasIntegratedServer())
             {
-                inv2 = fi.dy.masa.malilib.util.InventoryUtils.getNbtInventoryHorseFix(nbt, -1, entity.getRegistryManager());
+                inv2 = InventoryUtils.getNbtInventoryHorseFix(nbt, -1, entity.getRegistryManager());
                 inv = null;
             }
             // Fix for empty Villager/Piglin inv
             else if (inv != null && inv.size() == 8 &&
                     nbt.contains(NbtKeys.INVENTORY) &&
                     !nbt.getList(NbtKeys.INVENTORY, Constants.NBT.TAG_COMPOUND).isEmpty())
-            //!DataManager.getInstance().hasIntegratedServer())
+                    //!DataManager.getInstance().hasIntegratedServer())
             {
-                inv2 = fi.dy.masa.malilib.util.InventoryUtils.getNbtInventory(nbt, 8, entity.getRegistryManager());
+                inv2 = InventoryUtils.getNbtInventory(nbt, 8, entity.getRegistryManager());
                 inv = null;
             }
             else
             {
-                inv2 = fi.dy.masa.malilib.util.InventoryUtils.getNbtInventory(nbt, inv != null ? inv.size() : -1, entity.getRegistryManager());
+                inv2 = InventoryUtils.getNbtInventory(nbt, inv != null ? inv.size() : -1, entity.getRegistryManager());
 
                 if (inv2 != null)
                 {

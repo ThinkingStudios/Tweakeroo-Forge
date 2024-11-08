@@ -11,7 +11,7 @@ import fi.dy.masa.tweakeroo.Tweakeroo;
 public class DataManager implements IServerListener
 {
     private static final DataManager INSTANCE = new DataManager();
-    public static DataManager getInstance() {return INSTANCE;}
+    public static DataManager getInstance() { return INSTANCE; }
 
     private boolean hasCarpetServer;
     private boolean hasServuxServer;
@@ -21,7 +21,7 @@ public class DataManager implements IServerListener
     //private DynamicRegistryManager.Immutable registryManager = DynamicRegistryManager.EMPTY;
     private boolean hasIntegratedServer;
 
-    private DataManager() {}
+    private DataManager() { }
 
     public void reset(boolean isLogout)
     {
@@ -35,7 +35,7 @@ public class DataManager implements IServerListener
         }
         //else
         //{
-        //Tweakeroo.logger.info("DataManager#reset() - dimension change or log-in");
+            //Tweakeroo.logger.info("DataManager#reset() - dimension change or log-in");
         //}
     }
 
@@ -65,7 +65,7 @@ public class DataManager implements IServerListener
         this.setHasIntegratedServer(true, server);
     }
 
-    public boolean hasIntegratedServer() {return this.hasIntegratedServer;}
+    public boolean hasIntegratedServer() { return this.hasIntegratedServer; }
 
     public void setHasIntegratedServer(boolean toggle, @Nullable IntegratedServer server)
     {
@@ -85,6 +85,7 @@ public class DataManager implements IServerListener
     {
         this.registryManager = immutable;
     }
+
     public DynamicRegistryManager.Immutable getRegistryManager()
     {
         return this.registryManager;

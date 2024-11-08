@@ -2,8 +2,8 @@ package fi.dy.masa.tweakeroo.data;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.Nullable;
 import com.llamalad7.mixinextras.lib.apache.commons.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
 
 import com.mojang.datafixers.util.Either;
 import net.minecraft.block.BlockEntityProvider;
@@ -58,7 +58,7 @@ public class ServerDataSyncer implements IClientTickHandler
     {
         return INSTANCE;
     }
-
+    
     private final static ServuxTweaksHandler<ServuxTweaksPacket.Payload> HANDLER = ServuxTweaksHandler.getInstance();
     private final static MinecraftClient mc = MinecraftClient.getInstance();
     private int uptimeTicks = 0;
@@ -402,7 +402,7 @@ public class ServerDataSyncer implements IClientTickHandler
         else if (world.getBlockState(pos).getBlock() instanceof BlockEntityProvider)
         {
             if (DataManager.getInstance().hasIntegratedServer() == false &&
-                    FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+                FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
             {
                 this.pendingBlockEntitiesQueue.add(pos);
             }
@@ -430,7 +430,7 @@ public class ServerDataSyncer implements IClientTickHandler
             return this.entityCache.get(entityId).getRight();
         }
         if (DataManager.getInstance().hasIntegratedServer() == false &&
-                FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+            FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
         {
             this.pendingEntitiesQueue.add(entityId);
         }
@@ -487,9 +487,9 @@ public class ServerDataSyncer implements IClientTickHandler
                             }
 
                             if (stateAdj.getBlock() == state.getBlock() &&
-                                    dataAdj instanceof ChestBlockEntity inv2 &&
-                                    stateAdj.get(ChestBlock.CHEST_TYPE) != ChestType.SINGLE &&
-                                    stateAdj.get(ChestBlock.FACING) == state.get(ChestBlock.FACING))
+                                dataAdj instanceof ChestBlockEntity inv2 &&
+                                stateAdj.get(ChestBlock.CHEST_TYPE) != ChestType.SINGLE &&
+                                stateAdj.get(ChestBlock.FACING) == state.get(ChestBlock.FACING))
                             {
                                 Inventory invRight = type == ChestType.RIGHT ? inv1 : inv2;
                                 Inventory invLeft = type == ChestType.RIGHT ? inv2 : inv1;
