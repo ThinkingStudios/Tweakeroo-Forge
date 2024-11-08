@@ -100,7 +100,8 @@ public class MiscUtils
         ClientPlayerEntity player = mc.player;
         Input input = player.input;
 
-        if (input.jumping || input.sneaking ||
+        //if (input.jumping || input.sneaking ||
+        if (input.playerInput.jump() || input.playerInput.sneak() ||
             player.forwardSpeed != 0 || player.sidewaysSpeed != 0 || player.getAbilities().flying == false)
         {
             return;
@@ -420,7 +421,7 @@ public class MiscUtils
 
     public static void copyTextFromSign(SignBlockEntity te, boolean front)
     {
-        previousSignText = ((ISignTextAccess) te).getText(front);
+        previousSignText = ((ISignTextAccess) te).tweakeroo$getText(front);
     }
 
     public static void applyPreviousTextToSign(SignBlockEntity te, @Nullable AbstractSignEditScreen guiLines, boolean front)
@@ -430,7 +431,7 @@ public class MiscUtils
             te.setText(previousSignText, front);
 
             if (guiLines != null) {
-                ((IGuiEditSign) guiLines).applyText(previousSignText);
+                ((IGuiEditSign) guiLines).tweakeroo$applyText(previousSignText);
             }
         }
     }
@@ -481,9 +482,12 @@ public class MiscUtils
             actionResult = mc.interactionManager.interactEntity(player, entity, hand);
         }
 
-        if (actionResult.isAccepted() && actionResult.shouldSwingHand())
+        if (actionResult instanceof ActionResult.Success success)
         {
-            player.swingHand(hand);
+            if (success.swingSource() == ActionResult.SwingSource.CLIENT)
+            {
+                player.swingHand(hand);
+            }
         }
     }
 
@@ -707,10 +711,10 @@ public class MiscUtils
             GeneratorOptionsHolder generatorOptionsHolder = ((IMixinCustomizeFlatLevelScreen) screen).tweakeroo_getCreateWorldParent().getWorldCreator().getGeneratorOptionsHolder();
             DynamicRegistryManager.Immutable registryManager = generatorOptionsHolder.getCombinedRegistryManager();
             FeatureSet featureSet = generatorOptionsHolder.dataConfiguration().enabledFeatures();
-            RegistryEntryLookup<Biome> biomeLookup = registryManager.get(RegistryKeys.BIOME).getReadOnlyWrapper();
-            RegistryEntryLookup<StructureSet> structureLookup = registryManager.get(RegistryKeys.STRUCTURE_SET).getReadOnlyWrapper();;
-            RegistryEntryLookup<PlacedFeature> featuresLookup = registryManager.get(RegistryKeys.PLACED_FEATURE).getReadOnlyWrapper();;
-            RegistryEntryLookup<Block> blockLookup = registryManager.get(RegistryKeys.BLOCK).getReadOnlyWrapper();
+            RegistryEntryLookup<Biome> biomeLookup = registryManager.getOrThrow(RegistryKeys.BIOME);
+            RegistryEntryLookup<StructureSet> structureLookup = registryManager.getOrThrow(RegistryKeys.STRUCTURE_SET);
+            RegistryEntryLookup<PlacedFeature> featuresLookup = registryManager.getOrThrow(RegistryKeys.PLACED_FEATURE);
+            RegistryEntryLookup<Block> blockLookup = registryManager.getOrThrow(RegistryKeys.BLOCK).withFeatureFilter(featureSet);
             FlatChunkGeneratorConfig defaultConfig = FlatChunkGeneratorConfig.getDefaultConfig(biomeLookup, structureLookup, featuresLookup);
             FlatChunkGeneratorConfig currentConfig = screen.getConfig();
             RegistryEntry.Reference<Biome> referenceEntry = biomeLookup.getOrThrow(BiomeKeys.PLAINS);
@@ -725,7 +729,7 @@ public class MiscUtils
             try
             {
                 Optional<RegistryKey<Biome>> optBiome = Optional.ofNullable(Identifier.tryParse(biomeName)).map((biomeId) ->
-                                                                                                                        RegistryKey.of(RegistryKeys.BIOME, biomeId));
+                        RegistryKey.of(RegistryKeys.BIOME, biomeId));
 
                 biomeEntry = optBiome.flatMap(biomeLookup::getOptional).orElse(referenceEntry);
             }

@@ -32,12 +32,9 @@ public class InitHandler implements IInitializationHandler
         RenderEventHandler.getInstance().registerTooltipLastRenderer(renderer);
         RenderEventHandler.getInstance().registerWorldLastRenderer(renderer);
 
-        TickHandler.getInstance().registerClientTickHandler(new ClientTickHandler());
-
         IWorldLoadListener worldListener = new WorldLoadListener();
         WorldLoadHandler.getInstance().registerWorldLoadPreHandler(worldListener);
         WorldLoadHandler.getInstance().registerWorldLoadPostHandler(worldListener);
-
 
         ServerHandler.getInstance().registerServerHandler(DataManager.getInstance());
 
