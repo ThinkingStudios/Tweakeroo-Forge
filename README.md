@@ -19,3 +19,7 @@ For more information and the downloads (compiled builds), see releases
 - Open a command prompt/terminal to the repository directory
 - run 'gradlew build'
 - The built jar file will be in build/libs/
+
+## Credits
+- [maruohon/tweakeroo](https://github.com/maruohon/tweakeroo)
+- [sakura-ryoko/tweakeroo](https://github.com/sakura-ryoko/tweakeroo)

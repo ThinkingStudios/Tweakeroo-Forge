@@ -6,6 +6,8 @@ import fi.dy.masa.malilib.event.*;
 import fi.dy.masa.malilib.interfaces.IInitializationHandler;
 import fi.dy.masa.malilib.interfaces.IRenderer;
 import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
+import fi.dy.masa.malilib.registry.Registry;
+import fi.dy.masa.malilib.util.data.ModInfo;
 import fi.dy.masa.tweakeroo.config.Callbacks;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.data.DataManager;
@@ -14,6 +16,7 @@ import fi.dy.masa.tweakeroo.event.ClientTickHandler;
 import fi.dy.masa.tweakeroo.event.InputHandler;
 import fi.dy.masa.tweakeroo.event.RenderHandler;
 import fi.dy.masa.tweakeroo.event.WorldLoadListener;
+import fi.dy.masa.tweakeroo.gui.GuiConfigs;
 
 public class InitHandler implements IInitializationHandler
 {
@@ -21,6 +24,9 @@ public class InitHandler implements IInitializationHandler
     public void registerModHandlers()
     {
         ConfigManager.getInstance().registerConfigHandler(Reference.MOD_ID, new Configs());
+        Registry.CONFIG_SCREEN.registerConfigScreenFactory(
+                new ModInfo(Reference.MOD_ID, Reference.MOD_NAME, GuiConfigs::new)
+        );
         ServerDataSyncer.getInstance().onGameInit();
 
         InputEventHandler.getKeybindManager().registerKeybindProvider(InputHandler.getInstance());

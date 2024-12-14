@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.BlockHalf;
@@ -21,6 +22,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+
+import fi.dy.masa.malilib.util.game.BlockUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.data.DataManager;
@@ -36,6 +39,10 @@ public class PlacementHandler
             Properties.INVERTED,
             Properties.OPEN,
             //Properties.PERSISTENT,
+            // TODO --> TEST (Boolean)
+            Properties.POWERED,
+            Properties.LOCKED,
+            //Properties.WATERLOGGED
             // EnumProperty:
             // ATTACHMENT - Bells
             // AXIS - Pillar
@@ -56,6 +63,7 @@ public class PlacementHandler
             Properties.CHEST_TYPE,
             Properties.COMPARATOR_MODE,
             Properties.DOOR_HINGE,
+            Properties.FACING,
             Properties.HOPPER_FACING,
             Properties.HORIZONTAL_FACING,
             Properties.ORIENTATION,
@@ -124,11 +132,11 @@ public class PlacementHandler
             return state;
         }
 
-        @Nullable EnumProperty<Direction> property = fi.dy.masa.malilib.util.BlockUtils.getFirstDirectionProperty(state);
+        Optional<EnumProperty<Direction>> property = BlockUtils.getFirstDirectionProperty(state);
 
-        if (property != null)
+        if (property.isPresent())
         {
-            state = applyDirectionProperty(state, context, property, protocolValue);
+            state = applyDirectionProperty(state, context, property.get(), protocolValue);
 
             if (state == null)
             {
@@ -187,13 +195,13 @@ public class PlacementHandler
             return oldState;
         }
 
-        @Nullable EnumProperty<Direction> property = fi.dy.masa.malilib.util.BlockUtils.getFirstDirectionProperty(state);
+        Optional<EnumProperty<Direction>> property = BlockUtils.getFirstDirectionProperty(state);
 
         // DirectionProperty - allow all except: VERTICAL_DIRECTION (PointedDripstone)
-        if (property != null && property != Properties.VERTICAL_DIRECTION)
+        if (property.isPresent() && property.get() != Properties.VERTICAL_DIRECTION)
         {
             //System.out.printf("applying: 0x%08X\n", protocolValue);
-            state = applyDirectionProperty(state, context, property, protocolValue);
+            state = applyDirectionProperty(state, context, property.get(), protocolValue);
 
             if (state == null)
             {
@@ -224,7 +232,8 @@ public class PlacementHandler
         {
             for (Property<?> p : propList)
             {
-                if (((p instanceof EnumProperty<?> ep) && ep.getType().equals(Direction.class) == false) &&
+                //if (((p instanceof EnumProperty<?> ep) && ep.getType().equals(Direction.class) == false) &&
+                if (property.isPresent() && !property.get().equals(p) &&
                     WHITELISTED_PROPERTIES.contains(p))
                 {
                     @SuppressWarnings("unchecked")

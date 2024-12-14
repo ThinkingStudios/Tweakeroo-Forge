@@ -110,9 +110,9 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     private final static String FEATURE_KEY = Reference.ID+ ".config.feature_toggle";
 
     private final String name;
-    private final String comment;
-    private final String prettyName;
-    private final String translatedName;
+    private String comment;
+    private String prettyName;
+    private String translatedName;
     private final IKeybind keybind;
     private final boolean defaultValueBoolean;
     private final boolean singlePlayer;
@@ -250,12 +250,11 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     @Override
     public String getConfigGuiDisplayName()
     {
-        // This doesn't get called ?
-        String name = StringUtils.getTranslatedOrFallback(this.getTranslatedName(), this.getName());
+        String name = StringUtils.getTranslatedOrFallback(this.translatedName, this.name);
 
         if (this.singlePlayer)
         {
-            return GuiBase.TXT_GOLD + name + GuiBase.TXT_RST;
+            name = GuiBase.TXT_GOLD + name + GuiBase.TXT_RST;
         }
 
         return name;
@@ -265,7 +264,57 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     public String getPrettyName()
     {
         return StringUtils.getTranslatedOrFallback(this.prettyName,
-                !this.prettyName.isEmpty() ? this.prettyName : StringUtils.splitCamelCase(this.name.substring(5)));
+                                                   !this.prettyName.isEmpty() ? this.prettyName : StringUtils.splitCamelCase(this.name.substring(5)));
+    }
+
+    @Override
+    public String getTranslatedName()
+    {
+        String name = StringUtils.getTranslatedOrFallback(this.translatedName, this.name);
+
+        if (this.singlePlayer)
+        {
+            name = GuiBase.TXT_GOLD + name + GuiBase.TXT_RST;
+        }
+
+        return name;
+    }
+
+    @Override
+    public String getComment()
+    {
+        String comment = StringUtils.getTranslatedOrFallback(this.comment, this.comment);
+
+        if (comment != null && this.singlePlayer)
+        {
+            return comment + "\n" + StringUtils.translate("tweakeroo.label.config_comment.single_player_only");
+        }
+
+        //System.out.printf("FeatureToggle#getComment(): comment [%s] // test [%s]\n", this.comment, comment);
+        return comment;
+    }
+
+    @Override
+    public void setPrettyName(String s)
+    {
+        this.prettyName = s;
+    }
+
+    @Override
+    public void setTranslatedName(String s)
+    {
+        this.translatedName = s;
+    }
+
+    @Override
+    public void setComment(String s)
+    {
+        this.comment = s;
+    }
+
+    private static String buildTranslateName(String name, String type)
+    {
+        return FEATURE_KEY + "." + type + "." + name;
     }
 
     @Override
@@ -298,30 +347,6 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     public void setValueChangeCallback(IValueChangeCallback<IConfigBoolean> callback)
     {
         this.callback = callback;
-    }
-
-    @Override
-    public String getComment()
-    {
-        String comment = StringUtils.getTranslatedOrFallback(this.comment, this.comment);
-
-        if (comment != null && this.singlePlayer)
-        {
-            return comment + "\n" + StringUtils.translate("tweakeroo.label.config_comment.single_player_only");
-        }
-
-        return comment;
-    }
-
-    @Override
-    public String getTranslatedName()
-    {
-        return this.translatedName;
-    }
-
-    private static String buildTranslateName(String name, String type)
-    {
-        return FEATURE_KEY + "." + type + "." + name;
     }
 
     @Override
