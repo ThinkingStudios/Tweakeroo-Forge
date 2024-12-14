@@ -32,8 +32,9 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.MathHelper;
 
 import fi.dy.masa.malilib.render.InventoryOverlay;
-import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.malilib.util.game.BlockUtils;
+import fi.dy.masa.malilib.util.nbt.NbtBlockUtils;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
 import fi.dy.masa.tweakeroo.util.SnapAimMode;
@@ -350,11 +351,11 @@ public class RenderUtils
                 }
                 else if (context.nbt() != null)
                 {
-                    lockedSlots = BlockUtils.getDisabledSlotsFromNbt(context.nbt());
+                    lockedSlots = NbtBlockUtils.getDisabledSlotsFromNbt(context.nbt());
                 }
             }
 
-            //Tweakeroo.logger.warn("renderInventoryOverlay: type [{}] // Nbt Type [{}]", type.toString(), context.nbt() != null ? InventoryOverlay.getInventoryType(context.nbt()) : "INVALID");
+            //Tweakeroo.logger.warn("renderInventoryOverlay: type [{}] // Nbt Type [{}] // inv.isEmpty({})", type.toString(), context.nbt() != null ? InventoryOverlay.getInventoryType(context.nbt()) : "INVALID", inv.isEmpty());
 
             if (context.be() != null && context.be().getCachedState().getBlock() instanceof ShulkerBoxBlock sbb)
             {
@@ -369,16 +370,7 @@ public class RenderUtils
                 horseInv.setStack(1, inv.getStack(0));
 
                 InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc);
-                /*
-                if (type == InventoryOverlay.InventoryRenderType.LLAMA)
-                {
-                    InventoryOverlay.renderLlamaArmorBackgroundSlots(horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, drawContext);
-                }
-                else
-                {
-                    InventoryOverlay.renderHorseArmorBackgroundSlots(horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, drawContext);
-                }
-                 */
+                InventoryOverlay.renderInventoryBackgroundSlots(type, horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, drawContext);
                 InventoryOverlay.renderInventoryStacks(type, horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc, drawContext);
                 xInv += 32 + 4;
             }
@@ -386,6 +378,7 @@ public class RenderUtils
             if (totalSlots > 0)
             {
                 InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, totalSlots, mc);
+                // TODO 1.21.4+
                 /*
                 if (type == InventoryOverlay.InventoryRenderType.BREWING_STAND)
                 {
@@ -415,7 +408,7 @@ public class RenderUtils
             ItemStack wolfArmor = ((WolfEntity) entityLivingBase).getBodyArmor();
             wolfInv.setStack(0, wolfArmor != null && !wolfArmor.isEmpty() ? wolfArmor : ItemStack.EMPTY);
             InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc);
-            //InventoryOverlay.renderWolfArmorBackgroundSlots(wolfInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, drawContext);
+            InventoryOverlay.renderWolfArmorBackgroundSlots(wolfInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, drawContext);
             InventoryOverlay.renderInventoryStacks(type, wolfInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc, drawContext);
         }
 
@@ -653,6 +646,11 @@ public class RenderUtils
 
     public static void renderPitchLockIndicator(MinecraftClient mc, DrawContext drawContext)
     {
+        if (mc.player == null)
+        {
+            return;
+        }
+
         final int xCenter = GuiUtils.getScaledWindowWidth() / 2;
         final int yCenter = GuiUtils.getScaledWindowHeight() / 2;
         int width = 12;

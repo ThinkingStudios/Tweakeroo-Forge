@@ -1,23 +1,23 @@
 package fi.dy.masa.tweakeroo.mixin;
 
 import java.util.function.Predicate;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 
+import net.minecraft.block.enums.CameraSubmersionType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.AbstractDecorationEntity;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At.Shift;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fi.dy.masa.tweakeroo.config.Callbacks;
 import fi.dy.masa.tweakeroo.config.Configs;
@@ -31,8 +31,8 @@ public abstract class MixinGameRenderer
 {
     @Shadow @Final MinecraftClient client;
 
-    private float realYaw;
-    private float realPitch;
+    @Unique private float realYaw;
+    @Unique private float realPitch;
 
     @Inject(method = "renderWorld", at = @At("HEAD"), cancellable = true)
     private void onRenderWorld(CallbackInfo ci)
@@ -50,10 +50,36 @@ public abstract class MixinGameRenderer
         {
             cir.setReturnValue(Configs.Generic.ZOOM_FOV.getDoubleValue());
         }
-        else if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
+    }
+
+    @ModifyExpressionValue(method = "getFov", at = @At(value = "CONSTANT", args = "doubleValue=70.0"))
+    private double applyFreeCameraFov(double original)
+    {
+        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
-            cir.setReturnValue((double) this.client.options.getFov().getValue());
+            return ((double) this.client.options.getFov().getValue());
         }
+
+        return original;
+    }
+
+    @ModifyVariable(method = "getFov", at = @At(value = "LOAD", ordinal = 0), argsOnly = true)
+    private boolean freezeFovOnFreeCamera(boolean value)
+    {
+        return !FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && value;
+    }
+
+    @ModifyExpressionValue(
+            method = "getFov",  at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/render/Camera;getSubmersionType()Lnet/minecraft/block/enums/CameraSubmersionType;"))
+    private CameraSubmersionType ignoreSubmersionTypeOnFreeCamera(CameraSubmersionType original)
+    {
+        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
+        {
+            return CameraSubmersionType.NONE;
+        }
+
+        return original;
     }
 
     @Redirect(method = "updateCrosshairTarget", at = @At(value = "INVOKE",
