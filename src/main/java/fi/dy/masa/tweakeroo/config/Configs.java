@@ -46,6 +46,7 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList    BREAKING_RESTRICTION_MODE           = new ConfigOptionList  ("breakingRestrictionMode", PlacementRestrictionMode.LINE).apply(GENERIC_KEY);
         public static final ConfigBoolean       BUNDLE_DISPLAY_BACKGROUND_COLOR     = new ConfigBoolean     ("bundleDisplayBgColor", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       BUNDLE_DISPLAY_REQUIRE_SHIFT        = new ConfigBoolean     ("bundleDisplayRequireShift", true).apply(GENERIC_KEY);
+        public static final ConfigInteger       BUNDLE_DISPLAY_ROW_WIDTH            = new ConfigInteger     ("bundleDisplayRowWidth", 9, 6, 9).apply(GENERIC_KEY);
         public static final ConfigColor         CHAT_BACKGROUND_COLOR               = new ConfigColor       ("chatBackgroundColor", "#80000000").apply(GENERIC_KEY);
         public static final ConfigString        CHAT_TIME_FORMAT                    = new ConfigString      ("chatTimeFormat", "[HH:mm:ss]").apply(GENERIC_KEY);
         public static final ConfigBoolean       CLIENT_PLACEMENT_ROTATION           = new ConfigBoolean     ("clientPlacementRotation", true).apply(GENERIC_KEY);
@@ -77,6 +78,7 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList    HOTBAR_SWAP_OVERLAY_ALIGNMENT       = new ConfigOptionList  ("hotbarSwapOverlayAlignment", HudAlignment.BOTTOM_RIGHT).apply(GENERIC_KEY);
         public static final ConfigInteger       HOTBAR_SWAP_OVERLAY_OFFSET_X        = new ConfigInteger     ("hotbarSwapOverlayOffsetX", 4).apply(GENERIC_KEY);
         public static final ConfigInteger       HOTBAR_SWAP_OVERLAY_OFFSET_Y        = new ConfigInteger     ("hotbarSwapOverlayOffsetY", 4).apply(GENERIC_KEY);
+        public static final ConfigBoolean       INVENTORY_PREVIEW_VILLAGER_BG_COLOR = new ConfigBoolean     ("inventoryPreviewVillagerBGColor", false).apply(GENERIC_KEY);
         public static final ConfigInteger       ITEM_SWAP_DURABILITY_THRESHOLD      = new ConfigInteger     ("itemSwapDurabilityThreshold", 20, 5, 10000).apply(GENERIC_KEY);
         public static final ConfigBoolean       ITEM_USE_PACKET_CHECK_BYPASS        = new ConfigBoolean     ("itemUsePacketCheckBypass", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       MAP_PREVIEW_REQUIRE_SHIFT           = new ConfigBoolean     ("mapPreviewRequireShift", true).apply(GENERIC_KEY);
@@ -132,6 +134,7 @@ public class Configs implements IConfigHandler
                 ACCURATE_PLACEMENT_PROTOCOL,
                 BUNDLE_DISPLAY_BACKGROUND_COLOR,
                 BUNDLE_DISPLAY_REQUIRE_SHIFT,
+                BUNDLE_DISPLAY_ROW_WIDTH,
                 CLIENT_PLACEMENT_ROTATION,
                 DEBUG_LOGGING,
                 FAST_LEFT_CLICK_ALLOW_TOOLS,
@@ -140,6 +143,7 @@ public class Configs implements IConfigHandler
                 FREE_CAMERA_PLAYER_MOVEMENT,
                 HAND_RESTOCK_PRE,
                 HANGABLE_ENTITY_BYPASS_INVERSE,
+                INVENTORY_PREVIEW_VILLAGER_BG_COLOR,
                 ITEM_USE_PACKET_CHECK_BYPASS,
                 MAP_PREVIEW_REQUIRE_SHIFT,
                 PERMANENT_SNEAK_ALLOW_IN_GUIS,

@@ -12,8 +12,7 @@ public class Tweakeroo
     public static int renderCountItems;
     public static int renderCountXPOrbs;
 
-    public static void onInitialize()
-    {
+    public static void onInitialize() {
         InitializationHandler.getInstance().registerInitializationHandler(new InitHandler());
     }
 
