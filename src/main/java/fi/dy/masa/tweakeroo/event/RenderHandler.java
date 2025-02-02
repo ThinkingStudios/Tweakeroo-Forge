@@ -1,7 +1,8 @@
 package fi.dy.masa.tweakeroo.event;
 
-import com.llamalad7.mixinextras.lib.apache.commons.tuple.Pair;
 import com.mojang.blaze3d.systems.RenderSystem;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Matrix4f;
 
 import net.minecraft.client.MinecraftClient;
@@ -17,12 +18,10 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.World;
 
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRenderer;
-import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.util.ActiveMode;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.InventoryUtils;
@@ -32,8 +31,8 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
 import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
+import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
-import fi.dy.masa.tweakeroo.util.RayTraceUtils;
 
 public class RenderHandler implements IRenderer
 {
@@ -69,12 +68,16 @@ public class RenderHandler implements IRenderer
         if (FeatureToggle.TWEAK_INVENTORY_PREVIEW.getBooleanValue() &&
             Hotkeys.INVENTORY_PREVIEW.getKeybind().isKeybindHeld())
         {
+            /*
             InventoryOverlay.Context context = RayTraceUtils.getTargetInventory(mc);
 
             if (context != null)
             {
                 RenderUtils.renderInventoryOverlay(context, drawContext);
             }
+             */
+
+            InventoryOverlayHandler.getInstance().getRenderContext(drawContext, mc.getProfiler(), mc);
         }
 
         if (FeatureToggle.TWEAK_PLAYER_INVENTORY_PEEK.getBooleanValue() &&
@@ -134,7 +137,7 @@ public class RenderHandler implements IRenderer
 
                 if (player != null)
                 {
-                    Pair<Entity, NbtCompound> pair = ServerDataSyncer.getInstance().requestEntity(player.getId());
+                    Pair<Entity, NbtCompound> pair = ServerDataSyncer.getInstance().requestEntity(world, player.getId());
                     NbtCompound nbt = new NbtCompound();
                     EnderChestInventory inv;
 
@@ -160,7 +163,7 @@ public class RenderHandler implements IRenderer
             if (FeatureToggle.TWEAK_BUNDLE_DISPLAY.getBooleanValue() &&
                 (Configs.Generic.BUNDLE_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown()))
             {
-                fi.dy.masa.malilib.render.RenderUtils.renderBundlePreview(stack, x, y, Configs.Generic.BUNDLE_DISPLAY_BACKGROUND_COLOR.getBooleanValue(), drawContext);
+                fi.dy.masa.malilib.render.RenderUtils.renderBundlePreview(stack, x, y, Configs.Generic.BUNDLE_DISPLAY_ROW_WIDTH.getIntegerValue(), Configs.Generic.BUNDLE_DISPLAY_BACKGROUND_COLOR.getBooleanValue(), drawContext);
             }
         }
     }
@@ -195,6 +198,8 @@ public class RenderHandler implements IRenderer
 
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
+            // todo already updated in future versions, I just don't want to break existing
+            @SuppressWarnings("deprecation")
             Color4f color = Configs.Generic.FLEXIBLE_PLACEMENT_OVERLAY_COLOR.getColor();
 
             fi.dy.masa.malilib.render.RenderUtils.renderBlockTargetingOverlay(
