@@ -6,7 +6,7 @@ mappings_patch="1.21+build.4"
 neoforge="21.1.115"
 
 # Mod properties
-version="0.2.1"
+version="0.2.2"
 maven-group="org.thinkingstudio.tweakerge"
 archives-name="Tweakerge"
 
