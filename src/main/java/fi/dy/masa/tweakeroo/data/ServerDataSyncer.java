@@ -63,10 +63,13 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
     
     private final static ServuxTweaksHandler<ServuxTweaksPacket.Payload> HANDLER = ServuxTweaksHandler.getInstance();
     private final static MinecraftClient mc = MinecraftClient.getInstance();
-    private int uptimeTicks = 0;
+    //private int uptimeTicks = 0;
     private boolean servuxServer = false;
     private boolean hasInValidServux = false;
     private String servuxVersion;
+    private boolean checkOpStatus = true;
+    private boolean hasOpStatus = false;
+    private long lastOpCheck = 0L;
 
     // Data Cache
     private final ConcurrentHashMap<BlockPos, Pair<Long, Pair<BlockEntity, NbtCompound>>> blockEntityCache = new ConcurrentHashMap<>();
@@ -104,23 +107,23 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
     {
         long now = System.currentTimeMillis();
 
-        this.uptimeTicks++;
+        //this.uptimeTicks++;
         if (now - this.serverTickTime > 50)
         {
             // In this block, we do something every server tick
-            if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() == false)
+            if (!FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
             {
                 this.serverTickTime = now;
-                if (DataManager.getInstance().hasIntegratedServer() == false && this.hasServuxServer())
+                if (!DataManager.getInstance().hasIntegratedServer() && this.hasServuxServer())
                 {
                     this.servuxServer = false;
                     HANDLER.unregisterPlayReceiver();
                 }
                 return;
             }
-            else if (DataManager.getInstance().hasIntegratedServer() == false &&
-                    this.hasServuxServer() == false &&
-                    this.hasInValidServux == false &&
+            else if (!DataManager.getInstance().hasIntegratedServer() &&
+                    !this.hasServuxServer() &&
+                    !this.hasInValidServux &&
                     this.getWorld() != null)
             {
                 // Make sure we're Play Registered, and request Metadata
@@ -144,8 +147,9 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
                     {
                         requestServuxBlockEntityData(pos);
                     }
-                    else
+                    else if (this.shouldUseQuery())
                     {
+                        // Only check once if we have OP
                         requestQueryBlockEntity(pos);
                     }
                 }
@@ -158,8 +162,9 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
                     {
                         requestServuxEntityData(entityId);
                     }
-                    else
+                    else if (this.shouldUseQuery())
                     {
+                        // Only check once if we have OP
                         requestQueryEntityData(entityId);
                     }
                 }
@@ -194,21 +199,27 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
     {
         if (isLogout)
         {
-            Tweakeroo.printDebug("ServerDataSyncer#reset() - log-out");
+            Tweakeroo.debugLog("ServerDataSyncer#reset() - log-out");
             HANDLER.reset(this.getNetworkChannel());
             HANDLER.resetFailures(this.getNetworkChannel());
             this.servuxServer = false;
             this.hasInValidServux = false;
+            this.checkOpStatus = false;
+            this.hasOpStatus = false;
+            this.lastOpCheck = 0L;
         }
         else
         {
-            Tweakeroo.printDebug("ServerDataSyncer#reset() - dimension change or log-in");
+            Tweakeroo.debugLog("ServerDataSyncer#reset() - dimension change or log-in");
             long now = System.currentTimeMillis();
             this.serverTickTime = now - (this.getCacheTimeout() + 5000L);
             this.tickCache(now);
             this.serverTickTime = now;
             this.clientWorld = mc.world;
+            this.checkOpStatus = true;
+            this.lastOpCheck = now;
         }
+
         // Clear data
         this.blockEntityCache.clear();
         this.entityCache.clear();
@@ -216,15 +227,42 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         this.pendingEntitiesQueue.clear();
     }
 
+    private boolean shouldUseQuery()
+    {
+        if (this.hasOpStatus) return true;
+        if (this.checkOpStatus)
+        {
+            // Check for 15 minutes after login, or changing dimensions
+            if ((System.currentTimeMillis() - this.lastOpCheck) < 900000L) return true;
+            this.checkOpStatus = false;
+        }
+
+        return false;
+    }
+
+    public void resetOpCheck()
+    {
+        this.hasOpStatus = false;
+        this.checkOpStatus = true;
+        this.lastOpCheck = System.currentTimeMillis();
+    }
+
+    public long getCacheRefresh()
+    {
+        long result = (long) (MathHelper.clamp(Configs.Generic.SERVER_DATA_SYNC_CACHE_REFRESH.getFloatValue(), 0.05f, 1.0f) * 1000L);
+        long clamp = (this.getCacheTimeout() / 2);
+
+        return Math.min(result, clamp);
+    }
+
     private long getCacheTimeout()
     {
-        return (long) (MathHelper.clamp(Configs.Generic.SERVER_DATA_SYNC_CACHE_TIMEOUT.getFloatValue(), 0.25f, 25.0f) * 1000L);
+        return (long) (MathHelper.clamp(Configs.Generic.SERVER_DATA_SYNC_CACHE_TIMEOUT.getFloatValue(), 0.25f, 15.0f) * 1000L);
     }
 
     private void tickCache(long nowTime)
     {
-        long blockTimeout = this.getCacheTimeout();
-        long entityTimeout = this.getCacheTimeout();
+        long timeout = this.getCacheTimeout();
 
         synchronized (this.blockEntityCache)
         {
@@ -232,7 +270,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             {
                 Pair<Long, Pair<BlockEntity, NbtCompound>> pair = this.blockEntityCache.get(pos);
 
-                if (nowTime - pair.getLeft() > blockTimeout || pair.getLeft() > nowTime)
+                if (nowTime - pair.getLeft() > timeout || pair.getLeft() > nowTime)
                 {
                     //Tweakeroo.printDebug("entityCache: be at pos [{}] has timed out", pos.toShortString());
                     this.blockEntityCache.remove(pos);
@@ -246,7 +284,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             {
                 Pair<Long, Pair<Entity, NbtCompound>> pair = this.entityCache.get(entityId);
 
-                if (nowTime - pair.getLeft() > entityTimeout || pair.getLeft() > nowTime)
+                if (nowTime - pair.getLeft() > timeout || pair.getLeft() > nowTime)
                 {
                     //Tweakeroo.printDebug("entityCache: entity Id [{}] has timed out", entityId);
                     this.entityCache.remove(entityId);
@@ -312,10 +350,10 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
     public void setServuxVersion(String ver)
     {
-        if (ver != null && ver.isEmpty() == false)
+        if (ver != null && !ver.isEmpty())
         {
             this.servuxVersion = ver;
-            Tweakeroo.printDebug("tweaksDataChannel: joining Servux version {}", ver);
+            Tweakeroo.debugLog("tweaksDataChannel: joining Servux version {}", ver);
         }
         else
         {
@@ -358,7 +396,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
     @Override
     public void onWorldPre()
     {
-        if (DataManager.getInstance().hasIntegratedServer() == false)
+        if (!DataManager.getInstance().hasIntegratedServer())
         {
             HANDLER.registerPlayReceiver(ServuxTweaksPacket.Payload.ID, HANDLER::receivePlayPayload);
         }
@@ -372,7 +410,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
     public void requestMetadata()
     {
-        if (DataManager.getInstance().hasIntegratedServer() == false &&
+        if (!DataManager.getInstance().hasIntegratedServer() &&
             FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
         {
             NbtCompound nbt = new NbtCompound();
@@ -384,15 +422,15 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
     public boolean receiveServuxMetadata(NbtCompound data)
     {
-        if (DataManager.getInstance().hasIntegratedServer() == false)
+        if (!DataManager.getInstance().hasIntegratedServer())
         {
-            Tweakeroo.printDebug("ServerDataSyncer#receiveServuxMetadata(): received METADATA from Servux");
+            Tweakeroo.debugLog("tweaksDataChannel: received METADATA from Servux");
 
             if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
             {
                 if (data.getInt("version") != ServuxTweaksPacket.PROTOCOL_VERSION)
                 {
-                    Tweakeroo.logger.warn("tweaksDataChannel: Mis-matched protocol version!");
+                    Tweakeroo.LOGGER.warn("tweaksDataChannel: Mis-matched protocol version!");
                 }
 
                 DataManager.getInstance().setHasServuxServer(true);
@@ -418,11 +456,22 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
     {
         if (this.blockEntityCache.containsKey(pos))
         {
+            // Refresh at 25%
+            if (!DataManager.getInstance().hasIntegratedServer() &&
+                FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+            {
+                if (System.currentTimeMillis() - this.blockEntityCache.get(pos).getLeft() > this.getCacheRefresh())
+                {
+                    //Tweakeroo.debugLog("requestBlockEntity: be at pos [{}] requeue at [{}] ms", pos.toShortString(), this.getCacheRefresh());
+                    this.pendingBlockEntitiesQueue.add(pos);
+                }
+            }
+
             return this.blockEntityCache.get(pos).getRight();
         }
         else if (world.getBlockState(pos).getBlock() instanceof BlockEntityProvider)
         {
-            if (DataManager.getInstance().hasIntegratedServer() == false &&
+            if (!DataManager.getInstance().hasIntegratedServer() &&
                 FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
             {
                 this.pendingBlockEntitiesQueue.add(pos);
@@ -452,9 +501,20 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
     {
         if (this.entityCache.containsKey(entityId))
         {
+            // Refresh at 25%
+            if (!DataManager.getInstance().hasIntegratedServer() &&
+                FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+            {
+                if (System.currentTimeMillis() - this.entityCache.get(entityId).getLeft() > this.getCacheRefresh())
+                {
+                    //Tweakeroo.debugLog("requestEntity: entity Id [{}] requeue at [{}] ms", entityId, this.getCacheRefresh());
+                    this.pendingEntitiesQueue.add(entityId);
+                }
+            }
+
             return this.entityCache.get(entityId).getRight();
         }
-        if (DataManager.getInstance().hasIntegratedServer() == false &&
+        if (!DataManager.getInstance().hasIntegratedServer() &&
             FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
         {
             this.pendingEntitiesQueue.add(entityId);
@@ -608,7 +668,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
     private void requestQueryBlockEntity(BlockPos pos)
     {
-        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue() == false)
+        if (!FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
         {
             return;
         }
@@ -617,17 +677,14 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
         if (handler != null)
         {
-            handler.getDataQueryHandler().queryBlockNbt(pos, nbtCompound ->
-            {
-                handleBlockEntityData(pos, nbtCompound, null);
-            });
+            handler.getDataQueryHandler().queryBlockNbt(pos, nbtCompound -> handleBlockEntityData(pos, nbtCompound, null));
             this.transactionToBlockPosOrEntityId.put(((IMixinDataQueryHandler) handler.getDataQueryHandler()).malilib_currentTransactionId(), Either.left(pos));
         }
     }
 
     private void requestQueryEntityData(int entityId)
     {
-        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue() == false)
+        if (!FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
         {
             return;
         }
@@ -636,10 +693,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
         if (handler != null)
         {
-            handler.getDataQueryHandler().queryEntityNbt(entityId, nbtCompound ->
-            {
-                handleEntityData(entityId, nbtCompound);
-            });
+            handler.getDataQueryHandler().queryEntityNbt(entityId, nbtCompound -> handleEntityData(entityId, nbtCompound));
             this.transactionToBlockPosOrEntityId.put(((IMixinDataQueryHandler) handler.getDataQueryHandler()).malilib_currentTransactionId(), Either.right(entityId));
         }
     }
@@ -671,7 +725,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
         if (blockEntity != null && (type == null || type.equals(BlockEntityType.getId(blockEntity.getType()))))
         {
-            if (nbt.contains(NbtKeys.ID, Constants.NBT.TAG_STRING) == false)
+            if (!nbt.contains(NbtKeys.ID, Constants.NBT.TAG_STRING))
             {
                 Identifier id = BlockEntityType.getId(blockEntity.getType());
 
@@ -701,7 +755,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
                 if (blockEntity2 != null)
                 {
-                    if (nbt.contains(NbtKeys.ID, Constants.NBT.TAG_STRING) == false)
+                    if (!nbt.contains(NbtKeys.ID, Constants.NBT.TAG_STRING))
                     {
                         Identifier id = BlockEntityType.getId(beType);
 
@@ -733,7 +787,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
         if (entity != null)
         {
-            if (nbt.contains(NbtKeys.ID, Constants.NBT.TAG_STRING) == false)
+            if (!nbt.contains(NbtKeys.ID, Constants.NBT.TAG_STRING))
             {
                 Identifier id = EntityType.getId(entity.getType());
 
@@ -759,7 +813,15 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
     @Override
     public void handleVanillaQueryNbt(int transactionId, NbtCompound nbt)
     {
+        if (this.checkOpStatus)
+        {
+            this.hasOpStatus = true;
+            this.checkOpStatus = false;
+            this.lastOpCheck = System.currentTimeMillis();
+        }
+
         Either<BlockPos, Integer> either = this.transactionToBlockPosOrEntityId.remove(transactionId);
+
         if (either != null)
         {
             either.ifLeft(pos -> handleBlockEntityData(pos, nbt, null))

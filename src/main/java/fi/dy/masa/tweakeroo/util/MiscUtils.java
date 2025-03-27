@@ -4,6 +4,8 @@ import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Predicate;
@@ -27,6 +29,7 @@ import net.minecraft.client.world.GeneratorOptionsHolder;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -44,10 +47,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
@@ -61,6 +61,7 @@ import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.time.TimeFormat;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
@@ -105,7 +106,7 @@ public class MiscUtils
 
         //if (input.jumping || input.sneaking ||
         if (input.playerInput.jump() || input.playerInput.sneak() ||
-            player.forwardSpeed != 0 || player.sidewaysSpeed != 0 || player.getAbilities().flying == false)
+                player.forwardSpeed != 0 || player.sidewaysSpeed != 0 || player.getAbilities().flying == false)
         {
             return;
         }
@@ -123,17 +124,35 @@ public class MiscUtils
         int vertical = 0;
         int strafe = 0;
 
-        if (options.forwardKey.isPressed()) { forward += 1;  }
-        if (options.backKey.isPressed())    { forward -= 1;  }
-        if (options.leftKey.isPressed())    { strafe += 1;   }
-        if (options.rightKey.isPressed())   { strafe -= 1;   }
-        if (options.jumpKey.isPressed())    { vertical += 1; }
-        if (options.sneakKey.isPressed())   { vertical -= 1; }
+        if (options.forwardKey.isPressed())
+        {
+            forward += 1;
+        }
+        if (options.backKey.isPressed())
+        {
+            forward -= 1;
+        }
+        if (options.leftKey.isPressed())
+        {
+            strafe += 1;
+        }
+        if (options.rightKey.isPressed())
+        {
+            strafe -= 1;
+        }
+        if (options.jumpKey.isPressed())
+        {
+            vertical += 1;
+        }
+        if (options.sneakKey.isPressed())
+        {
+            vertical -= 1;
+        }
 
         double speed = (forward != 0 && strafe != 0) ? 1.2 : 1.0;
-        double forwardRamped  = getRampedMotion(lastMotion.x, forward , rampAmount, decelerationFactor) / speed;
+        double forwardRamped = getRampedMotion(lastMotion.x, forward, rampAmount, decelerationFactor) / speed;
         double verticalRamped = getRampedMotion(lastMotion.y, vertical, rampAmount, decelerationFactor);
-        double strafeRamped   = getRampedMotion(lastMotion.z, strafe  , rampAmount, decelerationFactor) / speed;
+        double strafeRamped = getRampedMotion(lastMotion.z, strafe, rampAmount, decelerationFactor) / speed;
 
         return new Vec3d(forwardRamped, verticalRamped, strafeRamped);
     }
@@ -166,7 +185,7 @@ public class MiscUtils
     public static boolean isZoomActive()
     {
         return FeatureToggle.TWEAK_ZOOM.getBooleanValue() &&
-               Hotkeys.ZOOM_ACTIVATE.getKeybind().isKeybindHeld();
+                Hotkeys.ZOOM_ACTIVATE.getKeybind().isKeybindHeld();
     }
 
     public static void checkZoomStatus()
@@ -196,7 +215,7 @@ public class MiscUtils
             if (lastZoomValue != null && lastZoomValue.isActive())
             {
                 if (lastZoomValue.getLastDoubleValue() != Configs.Generic.ZOOM_FOV.getDoubleValue() &&
-                    Configs.Generic.ZOOM_RESET_FOV_ON_ACTIVATE.getBooleanValue())
+                        Configs.Generic.ZOOM_RESET_FOV_ON_ACTIVATE.getBooleanValue())
                 {
                     Configs.Generic.ZOOM_FOV.setDoubleValue(lastZoomValue.getLastDoubleValue());
                 }
@@ -259,11 +278,11 @@ public class MiscUtils
             if (lastPeriodicAttackValue != null && lastPeriodicAttackValue.isActive())
             {
                 if (lastPeriodicAttackValue.getLastIntValue() != Configs.Generic.PERIODIC_ATTACK_INTERVAL.getIntegerValue() &&
-                    Configs.Generic.PERIODIC_ATTACK_RESET_ON_ACTIVATE.getBooleanValue())
+                        Configs.Generic.PERIODIC_ATTACK_RESET_ON_ACTIVATE.getBooleanValue())
                 {
                     Configs.Generic.PERIODIC_ATTACK_INTERVAL.setIntegerValue(lastPeriodicAttackValue.getLastIntValue());
                 }
-                
+
                 lastPeriodicAttackValue.setActionHandled();
             }
 
@@ -289,7 +308,7 @@ public class MiscUtils
             if (lastPeriodicUseValue != null && lastPeriodicUseValue.isActive())
             {
                 if (lastPeriodicUseValue.getLastIntValue() != Configs.Generic.PERIODIC_USE_INTERVAL.getIntegerValue() &&
-                    Configs.Generic.PERIODIC_USE_RESET_ON_ACTIVATE.getBooleanValue())
+                        Configs.Generic.PERIODIC_USE_RESET_ON_ACTIVATE.getBooleanValue())
                 {
                     Configs.Generic.PERIODIC_USE_INTERVAL.setIntegerValue(lastPeriodicUseValue.getLastIntValue());
                 }
@@ -319,11 +338,11 @@ public class MiscUtils
             if (lastPeriodicHoldAttackValue != null && lastPeriodicHoldAttackValue.isActive())
             {
                 if (lastPeriodicHoldAttackValue.getLastIntValue() != Configs.Generic.PERIODIC_HOLD_ATTACK_INTERVAL.getIntegerValue() &&
-                    Configs.Generic.PERIODIC_HOLD_ATTACK_RESET_ON_ACTIVATE.getBooleanValue())
+                        Configs.Generic.PERIODIC_HOLD_ATTACK_RESET_ON_ACTIVATE.getBooleanValue())
                 {
                     Configs.Generic.PERIODIC_HOLD_ATTACK_INTERVAL.setIntegerValue(lastPeriodicHoldAttackValue.getLastIntValue());
                 }
-                
+
                 lastPeriodicHoldAttackValue.setActionHandled();
             }
 
@@ -349,7 +368,7 @@ public class MiscUtils
             if (lastPeriodicHoldUseValue != null && lastPeriodicHoldUseValue.isActive())
             {
                 if (lastPeriodicHoldUseValue.getLastIntValue() != Configs.Generic.PERIODIC_HOLD_USE_INTERVAL.getIntegerValue() &&
-                    Configs.Generic.PERIODIC_HOLD_USE_RESET_ON_ACTIVATE.getBooleanValue())
+                        Configs.Generic.PERIODIC_HOLD_USE_RESET_ON_ACTIVATE.getBooleanValue())
                 {
                     Configs.Generic.PERIODIC_HOLD_USE_INTERVAL.setIntegerValue(lastPeriodicHoldUseValue.getLastIntValue());
                 }
@@ -396,7 +415,7 @@ public class MiscUtils
         style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(coords)));
         message.setStyle(style);
         mc.inGameHud.getChatHud().addMessage(message);
-        Tweakeroo.logger.info(str);
+        Tweakeroo.LOGGER.info(str);
     }
 
     public static String getChatTimestamp()
@@ -433,7 +452,8 @@ public class MiscUtils
         {
             te.setText(previousSignText, front);
 
-            if (guiLines != null) {
+            if (guiLines != null)
+            {
                 ((IGuiEditSign) guiLines).tweakeroo$applyText(previousSignText);
             }
         }
@@ -550,10 +570,13 @@ public class MiscUtils
             }
 
             double offset = Math.abs(MathHelper.wrapDegrees((float) (snappedPitch - realPitch)));
-            if (GuiBase.isCtrlDown()) System.out.printf("real: %.2f, snapped: %.2f, offset: %.2f\n", realPitch, snappedPitch, offset);
+            if (GuiBase.isCtrlDown())
+            {
+                System.out.printf("real: %.2f, snapped: %.2f, offset: %.2f\n", realPitch, snappedPitch, offset);
+            }
 
             if (Configs.Generic.SNAP_AIM_ONLY_CLOSE_TO_ANGLE.getBooleanValue() == false ||
-                offset <= Configs.Generic.SNAP_AIM_THRESHOLD_PITCH.getDoubleValue())
+                    offset <= Configs.Generic.SNAP_AIM_THRESHOLD_PITCH.getDoubleValue())
             {
                 snappedPitch = MathHelper.clamp(MathHelper.wrapDegrees(snappedPitch), -limit, limit);
 
@@ -597,7 +620,7 @@ public class MiscUtils
             double snappedYaw = calculateSnappedAngle(realYaw, step);
 
             if (Configs.Generic.SNAP_AIM_ONLY_CLOSE_TO_ANGLE.getBooleanValue() == false ||
-                Math.abs(MathHelper.wrapDegrees((float) (snappedYaw - realYaw))) <= Configs.Generic.SNAP_AIM_THRESHOLD_YAW.getDoubleValue())
+                    Math.abs(MathHelper.wrapDegrees((float) (snappedYaw - realYaw))) <= Configs.Generic.SNAP_AIM_THRESHOLD_YAW.getDoubleValue())
             {
                 if (Configs.Internal.SNAP_AIM_LAST_YAW.getDoubleValue() != snappedYaw)
                 {
@@ -626,6 +649,34 @@ public class MiscUtils
         return MathHelper.floorMod(((int) (offsetRealRotation / step)) * step, 360.0D);
     }
 
+    /**
+     * Copied from Tweak Fork by Andrew54757
+     */
+    public static Vec3d getEyesPos(PlayerEntity player)
+    {
+        return new Vec3d(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ());
+    }
+
+    /**
+     * Copied from Tweak Fork by Andrew54757
+     */
+    public static BlockPos getPlayerHeadPos(PlayerEntity player)
+    {
+        return (player.getPose() == EntityPose.STANDING) ? player.getBlockPos().offset(Direction.UP) : player.getBlockPos();
+    }
+
+    /**
+     * Copied from Tweak Fork by Andrew54757
+     */
+    public static boolean isInReach(BlockPos pos, PlayerEntity player, double reach)
+    {
+        Vec3d playerpos = getEyesPos(player);
+        double d = playerpos.getX() - ((double) pos.getX() + 0.5D);
+        double d1 = playerpos.getY() - ((double) pos.getY() + 0.5D);
+        double d2 = playerpos.getZ() - ((double) pos.getZ() + 0.5D);
+        return d * d + d1 * d1 + d2 * d2 <= reach * reach;
+    }
+
     public static boolean writeAllMapsAsImages()
     {
         MinecraftClient mc = MinecraftClient.getInstance();
@@ -640,32 +691,40 @@ public class MiscUtils
 
         if (worldName == null)
         {
-            worldName = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date(System.currentTimeMillis()));
+            //worldName = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date(System.currentTimeMillis()));
+            worldName = TimeFormat.REGULAR.formatNow();
         }
 
-        File dir = FileUtils.getConfigDirectory().toPath().resolve(Reference.MOD_ID).resolve("map_images").resolve(worldName).toFile();
+        Path dir = FileUtils.getConfigDirectoryAsPath().resolve(Reference.MOD_ID).resolve("map_images").resolve(worldName);
 
-        if (dir.exists() == false && dir.mkdirs() == false)
+        if (!Files.exists(dir))
         {
-            InfoUtils.showGuiOrInGameMessage(Message.MessageType.ERROR, "Failed to create directory: " + dir.getAbsolutePath());
-            return true;
+            FileUtils.createDirectoriesIfMissing(dir);
+            //Tweakeroo.debugLog("writeAllMapsAsImages(): Creating directory '{}'.", dir.toAbsolutePath());
         }
 
-        int count = 0;
-
-        for (Map.Entry<MapIdComponent, MapState> entry : data.entrySet())
+        if (Files.isDirectory(dir))
         {
-            File file = new File(dir, entry.getKey().asString() + ".png");
-            writeMapAsImage(file, entry.getValue());
-            ++count;
-        }
+            int count = 0;
 
-        InfoUtils.showGuiOrInGameMessage(Message.MessageType.INFO, String.format("Wrote %d maps to image files", count));
+            for (Map.Entry<MapIdComponent, MapState> entry : data.entrySet())
+            {
+                Path file = dir.resolve(entry.getKey().asString() + ".png");
+                writeMapAsImage(file, entry.getValue());
+                ++count;
+            }
+
+            InfoUtils.showGuiOrInGameMessage(Message.MessageType.INFO, String.format("Wrote %d maps to image files", count));
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(Message.MessageType.ERROR, "Failed to create directory: " + dir.toAbsolutePath());
+        }
 
         return true;
     }
 
-    private static void writeMapAsImage(File fileOut, MapState state)
+    private static void writeMapAsImage(Path fileOut, MapState state)
     {
         BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
 
@@ -676,19 +735,19 @@ public class MiscUtils
                 int index = x + y * 128;
                 int color = MapColor.getRenderColor(state.colors[index]);
                 // Swap the color channels from ABGR to ARGB
-                int outputColor = (color & 0xFF00FF00) | (color & 0xFF0000) >> 16 | (color & 0xFF) << 16;
+                //int outputColor = (color & 0xFF00FF00) | (color & 0xFF0000) >> 16 | (color & 0xFF) << 16;
 
-                image.setRGB(x, y, outputColor);
+                image.setRGB(x, y, color);
             }
         }
 
         try
         {
-            ImageIO.write(image, "png", fileOut);
+            ImageIO.write(image, "png", fileOut.toFile());
         }
         catch (Exception e)
         {
-            InfoUtils.showGuiOrInGameMessage(Message.MessageType.ERROR, "Failed to write image to file: " + fileOut.getAbsolutePath());
+            InfoUtils.showGuiOrInGameMessage(Message.MessageType.ERROR, "Failed to write image to file: " + fileOut.toAbsolutePath());
         }
     }
 
@@ -732,15 +791,17 @@ public class MiscUtils
             try
             {
                 Optional<RegistryKey<Biome>> optBiome = Optional.ofNullable(Identifier.tryParse(biomeName)).map((biomeId) ->
-                        RegistryKey.of(RegistryKeys.BIOME, biomeId));
+                                                                                                                        RegistryKey.of(RegistryKeys.BIOME, biomeId));
 
                 biomeEntry = optBiome.flatMap(biomeLookup::getOptional).orElse(referenceEntry);
             }
-            catch (Exception ignore) {}
+            catch (Exception ignore)
+            {
+            }
 
             if (biomeEntry == null)
             {
-                Tweakeroo.logger.error("Invalid biome while parsing flat world string: '{}'", biomeName);
+                Tweakeroo.LOGGER.error("Invalid biome while parsing flat world string: '{}'", biomeName);
                 return false;
             }
 
@@ -754,11 +815,13 @@ public class MiscUtils
                     item = opt.get().value();
                 }
             }
-            catch (Exception ignore) {}
+            catch (Exception ignore)
+            {
+            }
 
             if (item == null)
             {
-                Tweakeroo.logger.error("Invalid item for icon while parsing flat world string: '{}'", iconItemName);
+                Tweakeroo.LOGGER.error("Invalid item for icon while parsing flat world string: '{}'", iconItemName);
                 return false;
             }
 
@@ -766,7 +829,7 @@ public class MiscUtils
 
             if (layers == null)
             {
-                Tweakeroo.logger.error("Failed to get the layers for the flat world preset");
+                Tweakeroo.LOGGER.error("Failed to get the layers for the flat world preset");
                 return false;
             }
 
@@ -781,7 +844,7 @@ public class MiscUtils
         }
         else
         {
-            Tweakeroo.logger.error("Flat world preset string did not match the regex");
+            Tweakeroo.LOGGER.error("Flat world preset string did not match the regex");
         }
 
         return false;
