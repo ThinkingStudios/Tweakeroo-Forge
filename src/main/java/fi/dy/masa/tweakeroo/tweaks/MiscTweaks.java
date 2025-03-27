@@ -126,7 +126,7 @@ public class MiscTweaks
     public static void onGameLoop(MinecraftClient mc)
     {
         PlacementTweaks.onTick(mc);
-
+        RenderTweaks.onTick();
         // Reset the counters after rendering each frame
         Tweakeroo.renderCountItems = 0;
         Tweakeroo.renderCountXPOrbs = 0;
@@ -292,7 +292,7 @@ public class MiscTweaks
             }
             catch (NumberFormatException e)
             {
-                Tweakeroo.logger.error("Error while parsing flat world string => {}", e.getMessage());
+                Tweakeroo.LOGGER.error("Error while parsing flat world string => {}", e.getMessage());
                 return null;
             }
         }
@@ -311,13 +311,13 @@ public class MiscTweaks
         }
         catch (Exception e)
         {
-            Tweakeroo.logger.error("Error while parsing flat world string => {}", e.getMessage());
+            Tweakeroo.LOGGER.error("Error while parsing flat world string => {}", e.getMessage());
             return null;
         }
 
         if (block == null)
         {
-            Tweakeroo.logger.error("Error while parsing flat world string => Unknown block, {}", strings[strings.length - 1]);
+            Tweakeroo.LOGGER.error("Error while parsing flat world string => Unknown block, {}", strings[strings.length - 1]);
             return null;
         }
         else

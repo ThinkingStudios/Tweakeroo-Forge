@@ -17,7 +17,7 @@ Adds a bunch of configurable client-side tweaks.
 '''
 
 [[mixins]]
-config = "tweakerge.mixins.json"
+config = "mixins.tweakeroo.json"
 
 [[dependencies.tweakerge]]
 modId = "neoforge"
