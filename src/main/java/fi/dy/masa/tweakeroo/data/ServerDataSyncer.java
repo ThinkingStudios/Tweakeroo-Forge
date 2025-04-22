@@ -37,13 +37,12 @@ import net.minecraft.world.World;
 import fi.dy.masa.malilib.interfaces.IClientTickHandler;
 import fi.dy.masa.malilib.interfaces.IDataSyncer;
 import fi.dy.masa.malilib.mixin.entity.IMixinAbstractHorseEntity;
-import fi.dy.masa.malilib.mixin.entity.IMixinDataQueryHandler;
 import fi.dy.masa.malilib.mixin.entity.IMixinPiglinEntity;
+import fi.dy.masa.malilib.mixin.network.IMixinDataQueryHandler;
 import fi.dy.masa.malilib.network.ClientPlayHandler;
 import fi.dy.masa.malilib.network.IPluginClientPlayHandler;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
-import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.nbt.NbtKeys;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
@@ -119,7 +118,11 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
                     this.servuxServer = false;
                     HANDLER.unregisterPlayReceiver();
                 }
-                return;
+
+                if (!FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
+                {
+                    return;
+                }
             }
             else if (!DataManager.getInstance().hasIntegratedServer() &&
                     !this.hasServuxServer() &&
@@ -428,13 +431,13 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
             if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
             {
-                if (data.getInt("version") != ServuxTweaksPacket.PROTOCOL_VERSION)
+                if (data.getInt("version", -1) != ServuxTweaksPacket.PROTOCOL_VERSION)
                 {
                     Tweakeroo.LOGGER.warn("tweaksDataChannel: Mis-matched protocol version!");
                 }
 
                 DataManager.getInstance().setHasServuxServer(true);
-                this.setServuxVersion(data.getString("servux"));
+                this.setServuxVersion(data.getString("servux", ""));
                 this.setIsServuxServer();
 
                 return true;
@@ -458,7 +461,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         {
             // Refresh at 25%
             if (!DataManager.getInstance().hasIntegratedServer() &&
-                FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+                (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue()))
             {
                 if (System.currentTimeMillis() - this.blockEntityCache.get(pos).getLeft() > this.getCacheRefresh())
                 {
@@ -472,7 +475,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         else if (world.getBlockState(pos).getBlock() instanceof BlockEntityProvider)
         {
             if (!DataManager.getInstance().hasIntegratedServer() &&
-                FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+                (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue()))
             {
                 this.pendingBlockEntitiesQueue.add(pos);
             }
@@ -503,7 +506,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         {
             // Refresh at 25%
             if (!DataManager.getInstance().hasIntegratedServer() &&
-                FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+                (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue()))
             {
                 if (System.currentTimeMillis() - this.entityCache.get(entityId).getLeft() > this.getCacheRefresh())
                 {
@@ -515,7 +518,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             return this.entityCache.get(entityId).getRight();
         }
         if (!DataManager.getInstance().hasIntegratedServer() &&
-            FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+            (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue()))
         {
             this.pendingEntitiesQueue.add(entityId);
         }
@@ -606,7 +609,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             }
         }
 
-        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
         {
             this.requestBlockEntity(world, pos);
         }
@@ -636,7 +639,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
                 }
                 else if (entity instanceof PlayerEntity player)
                 {
-                    inv = new SimpleInventory(player.getInventory().main.toArray(new ItemStack[36]));
+                    inv = new SimpleInventory(player.getInventory().getMainStacks().toArray(new ItemStack[36]));
                 }
                 else if (entity instanceof VillagerEntity)
                 {
@@ -658,7 +661,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             }
         }
 
-        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
         {
             this.requestEntity(world, entityId);
         }
@@ -725,7 +728,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
         if (blockEntity != null && (type == null || type.equals(BlockEntityType.getId(blockEntity.getType()))))
         {
-            if (!nbt.contains(NbtKeys.ID, Constants.NBT.TAG_STRING))
+            if (!nbt.contains(NbtKeys.ID))
             {
                 Identifier id = BlockEntityType.getId(blockEntity.getType());
 
@@ -755,7 +758,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
                 if (blockEntity2 != null)
                 {
-                    if (!nbt.contains(NbtKeys.ID, Constants.NBT.TAG_STRING))
+                    if (!nbt.contains(NbtKeys.ID))
                     {
                         Identifier id = BlockEntityType.getId(beType);
 
@@ -787,7 +790,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
         if (entity != null)
         {
-            if (!nbt.contains(NbtKeys.ID, Constants.NBT.TAG_STRING))
+            if (!nbt.contains(NbtKeys.ID))
             {
                 Identifier id = EntityType.getId(entity.getType());
 

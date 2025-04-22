@@ -785,7 +785,7 @@
     "tweakeroo.gui.label.easy_place_protocol.slabs_only": "Slabs only",
     "tweakeroo.gui.label.easy_place_protocol.v2": "Version 2",
     "tweakeroo.gui.label.easy_place_protocol.v3": "Version 3",
-    "tweakeroo.gui.title.configs": "%s Configs - %s",
+    "tweakeroo.gui.title.configs": "Tweakeroo Configs - %s",
     "tweakeroo.hotkeys.category.disable_toggle_hotkeys": "Disable Toggle Hotkeys",
     "tweakeroo.hotkeys.category.generic_hotkeys": "Generic hotkeys",
     "tweakeroo.hotkeys.category.tweak_toggle_hotkeys": "Tweak toggle hotkeys",
@@ -846,5 +846,13 @@
     "tweakeroo.message.value.off": "OFF",
     "tweakeroo.message.value.on": "ON",
     "tweakeroo.message.warning.block_type_break_restriction": "§6Block breaking prevented by Block Type Break Restriction tweak",
-    "tweakeroo.message.warning.entity_type_attack_restriction": "§6Entity attack prevented by Entity Type Attack Restriction tweak"
+    "tweakeroo.message.warning.entity_type_attack_restriction": "§6Entity attack prevented by Entity Type Attack Restriction tweak",
+    "tweakeroo.config.generic.comment.flySpeedIncrement1": "How much the fly speed changes for increment 1",
+    "tweakeroo.config.generic.comment.flySpeedIncrement2": "How much the fly speed changes for increment 2",
+    "tweakeroo.config.generic.name.flySpeedIncrement1": "flySpeedIncrement1",
+    "tweakeroo.config.generic.name.flySpeedIncrement2": "flySpeedIncrement2",
+    "tweakeroo.config.hotkey.comment.flyIncrement1": "Change fly speed by increment 1",
+    "tweakeroo.config.hotkey.comment.flyIncrement2": "Change fly speed by increment 2",
+    "tweakeroo.config.hotkey.name.flyIncrement1": "flyIncrement1",
+    "tweakeroo.config.hotkey.name.flyIncrement2": "flyIncrement2"
 }

@@ -28,7 +28,7 @@ public class GuiConfigs extends GuiConfigsBase
 
     public GuiConfigs()
     {
-        super(10, 50, Reference.MOD_ID, null, "tweakeroo.gui.title.configs", Reference.MOD_NAME, Reference.MOD_VERSION);
+        super(10, 50, Reference.MOD_ID, null, "tweakeroo.gui.title.configs", String.format("%s", Reference.MOD_VERSION));
     }
 
     @Override

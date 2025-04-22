@@ -8,6 +8,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.Entity;
+
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
@@ -15,15 +17,16 @@ import fi.dy.masa.tweakeroo.util.CameraUtils;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
 import fi.dy.masa.tweakeroo.util.SnapAimMode;
 
-@Mixin(net.minecraft.entity.Entity.class)
+@Mixin(Entity.class)
 public abstract class MixinEntity
 {
     @Shadow public abstract net.minecraft.util.math.Vec3d getVelocity();
     @Shadow public abstract void setVelocity(net.minecraft.util.math.Vec3d velocity);
     @Shadow private float yaw;
     @Shadow private float pitch;
-    @Shadow public float prevYaw;
-    @Shadow public float prevPitch;
+    @Shadow public float lastYaw;
+    @Shadow public float lastPitch;
+
     @Unique private double forcedPitch;
     @Unique private double forcedYaw;
 
@@ -74,8 +77,8 @@ public abstract class MixinEntity
             {
                 this.yaw = (float) this.forcedYaw;
                 this.pitch = (float) this.forcedPitch;
-                this.prevYaw = this.yaw;
-                this.prevPitch = this.pitch;
+                this.lastYaw = this.yaw;
+                this.lastPitch = this.pitch;
                 ci.cancel();
 
                 return;
@@ -96,8 +99,8 @@ public abstract class MixinEntity
 
                 this.yaw = MiscUtils.getSnappedYaw(this.forcedYaw);
                 this.pitch = MiscUtils.getSnappedPitch(this.forcedPitch);
-                this.prevYaw = this.yaw;
-                this.prevPitch = this.pitch;
+                this.lastYaw = this.yaw;
+                this.lastPitch = this.pitch;
                 ci.cancel();
 
                 return;
@@ -118,10 +121,10 @@ public abstract class MixinEntity
                 CameraUtils.setCameraYaw((float) this.forcedYaw);
                 CameraUtils.setCameraPitch((float) this.forcedPitch);
 
-                this.yaw = this.prevYaw;
-                this.pitch = this.prevPitch;
-                this.prevYaw = this.yaw;
-                this.prevPitch = this.pitch;
+                this.yaw = this.lastYaw;
+                this.pitch = this.lastPitch;
+                this.lastYaw = this.yaw;
+                this.lastPitch = this.pitch;
                 ci.cancel();
 
                 return;
