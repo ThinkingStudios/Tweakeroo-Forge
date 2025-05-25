@@ -1,3 +1,4 @@
 ## Change
-- update MaFgLib
-- update NeoForge version to `21.3.73`
+- sync 1.21.3-0.22.5
+- update mafglib
+- update NeoForge version to `21.3.76`
