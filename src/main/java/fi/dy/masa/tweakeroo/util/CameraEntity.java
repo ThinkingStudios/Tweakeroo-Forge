@@ -1,6 +1,7 @@
 package fi.dy.masa.tweakeroo.util;
 
 import javax.annotation.Nullable;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -12,6 +13,7 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.stat.StatHandler;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
@@ -107,12 +109,7 @@ public class CameraEntity extends ClientPlayerEntity
 
     private void updateLastTickPosition()
     {
-        this.setLastPositionAndAngles(new Vec3d(this.getX(), this.getY(), this.getZ()), this.getYaw(), this.getPitch());
-        this.lastHeadYaw = this.headYaw;
-
-        // TODO why did Yarn break this?
-        //  Entity *IS* an enclosing class ?
-        /*
+//        this.setLastPositionAndAngles(new Vec3d(this.getX(), this.getY(), this.getZ()), this.getYaw(), this.getPitch());
         this.lastRenderX = this.getX();
         this.lastRenderY = this.getY();
         this.lastRenderZ = this.getZ();
@@ -123,7 +120,8 @@ public class CameraEntity extends ClientPlayerEntity
 
         this.lastYaw = this.getYaw();
         this.lastPitch = this.getPitch();
-         */
+
+        this.lastHeadYaw = this.headYaw;
     }
 
     public void setCameraRotations(float yaw, float pitch)
@@ -154,13 +152,35 @@ public class CameraEntity extends ClientPlayerEntity
     private static CameraEntity createCameraEntity(MinecraftClient mc)
     {
         ClientPlayerEntity player = mc.player;
-        CameraEntity camera = new CameraEntity(mc, mc.world, player.networkHandler, player.getStatHandler(), player.getRecipeBook());
-        camera.noClip = true;
+
+        if (player == null)
+        {
+            throw new RuntimeException("Cannot create CameraEntity from null!");
+        }
+
+//        Vec3d eyePos = player.getEyePos();
+        Vec3d entityPos = player.getPos();
+//        BlockPos blockPos = player.getBlockPos();
         float yaw = player.getYaw();
         float pitch = player.getPitch();
 
-        camera.refreshPositionAndAngles(player.getX(), player.getY(), player.getZ(), yaw, pitch);
-        camera.setRotation(yaw, pitch);
+        mc.player.setVelocity(Vec3d.ZERO);
+
+        CameraEntity camera = new CameraEntity(mc, mc.world, player.networkHandler, player.getStatHandler(), player.getRecipeBook());
+        camera.noClip = true;
+//
+//        camera.refreshPositionAndAngles(player.getX(), player.getY(), player.getZ(), yaw, pitch);
+//        camera.setRotation(yaw, pitch);
+
+//        Tweakeroo.LOGGER.error("CameraEntity::new() [PLAYER] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", eyePos.toString(), entityPos.toString(), blockPos.toShortString(), player.getVelocity().toString());
+
+        camera.setPos(entityPos.getX(), entityPos.getY() + 0.125f, entityPos.getZ());
+        camera.setYaw(yaw);
+        camera.setPitch(pitch);
+        camera.setVelocity(Vec3d.ZERO);
+
+//        Tweakeroo.LOGGER.error("CameraEntity::new() [CAM] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", camera.getEyePos().toString(), camera.getPos().toString(), camera.getBlockPos().toShortString(), camera.getVelocity().toString());
+//        Tweakeroo.LOGGER.error("CameraEntity::new() [AFTER] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", mc.player.getEyePos().toString(), mc.player.getPos().toString(), mc.player.getBlockPos().toShortString(), mc.player.getVelocity().toString());
 
         return camera;
     }
