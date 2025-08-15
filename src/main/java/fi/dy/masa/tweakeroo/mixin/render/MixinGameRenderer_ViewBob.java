@@ -1,9 +1,10 @@
 package fi.dy.masa.tweakeroo.mixin.render;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import fi.dy.masa.tweakeroo.config.Configs;
@@ -17,13 +18,17 @@ public abstract class MixinGameRenderer_ViewBob
     @Shadow
     protected abstract void bobView(MatrixStack matrices, float tickDelta);
 
-    @Redirect(method = "renderWorld", require = 0, at = @At(value = "INVOKE",
+    @WrapOperation(method = "renderWorld", require = 0, at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V"))
-    private void disableWorldViewBob(GameRenderer renderer, MatrixStack matrices, float tickDelta)
+    private void disableWorldViewBob(GameRenderer renderer, MatrixStack matrices, float tickDelta, Operation<Void> original)
     {
         if (Configs.Disable.DISABLE_WORLD_VIEW_BOB.getBooleanValue() == false)
         {
             this.bobView(matrices, tickDelta);
+        }
+        else
+        {
+            original.call(renderer, matrices, tickDelta);
         }
     }
 }
