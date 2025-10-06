@@ -1,5 +1,5 @@
 > [!IMPORTANT]
-> MaFgLib 0.4.0 and above source code move to [CagayakeGirls/malilib-neoforge](https://github.com/CagayakeGirls/malilib-neoforge).
+> Tweakerge 0.4.0 and above source code move to [CagayakeGirls/malilib-neoforge](https://github.com/CagayakeGirls/tweakeroo-neoforge).
 
 <center><div align="center">
 
