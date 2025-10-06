@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> MaFgLib 0.4.0 and above source code move to [CagayakeGirls/malilib-neoforge](https://github.com/CagayakeGirls/malilib-neoforge).
+
 <center><div align="center">
 
 <img height="100" src="icon/400x400.png" width="100"/>
